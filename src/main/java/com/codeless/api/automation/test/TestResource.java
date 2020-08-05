@@ -13,7 +13,6 @@ public class TestResource {
 
   @RequestMapping(method = RequestMethod.POST)
   public void createTest(@RequestBody TestDto testDto) {
-    System.out.println(testDto.getName());
   }
 
 }
