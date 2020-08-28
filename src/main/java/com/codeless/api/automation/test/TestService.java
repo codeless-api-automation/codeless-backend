@@ -1,8 +1,6 @@
 package com.codeless.api.automation.test;
 
-import org.springframework.stereotype.Service;
+public interface TestService {
 
-@Service
-public class TestService {
-
+  Test saveTest(TestDto testDto);
 }

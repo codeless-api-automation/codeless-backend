@@ -1,9 +1,17 @@
 package com.codeless.api.automation.test;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Map;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder
+@JsonDeserialize(builder = TestDto.TestRequestBuilder.class)
 public class TestDto {
-  private String name;
-  private String json;
+
+  @NotBlank String name;
+  @NotNull Map<Object, Object> json;
 }
