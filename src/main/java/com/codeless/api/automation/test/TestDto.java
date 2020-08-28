@@ -9,7 +9,7 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = TestDto.TestRequestBuilder.class)
+@JsonDeserialize(builder = TestDto.TestDtoBuilder.class)
 public class TestDto {
 
   @NotBlank String name;
