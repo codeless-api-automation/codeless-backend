@@ -4,8 +4,10 @@ import static com.codeless.api.automation.util.RestApiConstant.SINGLE_TEST_RESOU
 import static com.codeless.api.automation.util.RestApiConstant.TEST_RESOURCE;
 
 import java.net.URI;
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,11 +26,12 @@ public class TestResource {
   private TestService testService;
 
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity<Void> createTest(@RequestBody @Valid TestDto testDto) {
-    Test createdTest = testService.saveTest(testDto);
+  public ResponseEntity<TestDto> createTest(@RequestBody @Valid TestDto testDto) {
+    TestDto createdTest = testService.saveTest(testDto);
     return ResponseEntity
-        .created(URI.create(SINGLE_TEST_RESOURCE_WITH_ROOT_PATH + createdTest.getId()))
-        .build();
+        .status(HttpStatus.CREATED)
+        .location(URI.create(SINGLE_TEST_RESOURCE_WITH_ROOT_PATH + createdTest.getId()))
+        .body(createdTest);
   }
 
 }

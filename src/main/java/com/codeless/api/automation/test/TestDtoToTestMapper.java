@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestMapper implements Mapper<TestDto, Test> {
+public class TestDtoToTestMapper implements Mapper<TestDto, Test> {
 
   @Autowired
   private ObjectMapper objectMapper;

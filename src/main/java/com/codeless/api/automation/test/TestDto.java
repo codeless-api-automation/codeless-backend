@@ -12,6 +12,7 @@ import lombok.Value;
 @JsonDeserialize(builder = TestDto.TestDtoBuilder.class)
 public class TestDto {
 
+  Integer id;
   @NotBlank String name;
   @NotNull Map<Object, Object> json;
 }

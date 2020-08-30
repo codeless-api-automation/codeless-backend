@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 public class TestServiceImpl implements TestService {
 
   @Autowired
-  private Mapper<TestDto, Test> testMapper;
+  private Mapper<TestDto, Test> testDtoToTestMapper;
+  @Autowired
+  private Mapper<Test, TestDto> testToTestDtoMapper;
   @Autowired
   private TestRepository testRepository;
 
   @Override
-  public Test saveTest(TestDto testDto) {
-    return testRepository.save(testMapper.map(testDto));
+  public TestDto saveTest(TestDto testDto) {
+    return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
   }
 }
