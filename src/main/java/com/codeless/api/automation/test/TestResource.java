@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
@@ -32,6 +33,12 @@ public class TestResource {
         .status(HttpStatus.CREATED)
         .location(URI.create(SINGLE_TEST_RESOURCE_WITH_ROOT_PATH + createdTest.getId()))
         .body(createdTest);
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public PageDto<TestDto> getAllTests(@RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "5") Integer size) {
+    return testService.getAllTests(page, size);
   }
 
 }
