@@ -1,5 +1,6 @@
-package com.codeless.api.automation.test;
+package com.codeless.api.automation.mapper;
 
+import com.codeless.api.automation.dto.request.Test;
 import com.codeless.api.automation.function.Mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -10,14 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestToTestDtoMapper implements Mapper<Test, TestDto> {
+public class TestToTestDtoMapper implements Mapper<com.codeless.api.automation.entity.Test, Test> {
 
   @Autowired
   private ObjectMapper objectMapper;
 
   @Override
-  public TestDto map(Test source) {
-    return TestDto.builder()
+  public Test map(com.codeless.api.automation.entity.Test source) {
+    return Test.builder()
         .id(source.getId())
         .name(source.getName())
         .json(toMap(source.getJson()))

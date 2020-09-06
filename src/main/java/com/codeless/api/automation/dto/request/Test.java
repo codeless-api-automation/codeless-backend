@@ -1,4 +1,4 @@
-package com.codeless.api.automation.test;
+package com.codeless.api.automation.dto.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Map;
@@ -9,8 +9,8 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = TestDto.TestDtoBuilder.class)
-public class TestDto {
+@JsonDeserialize(builder = Test.TestBuilder.class)
+public class Test {
 
   Integer id;
   @NotBlank String name;

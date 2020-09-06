@@ -1,4 +1,4 @@
-package com.codeless.api.automation.test;
+package com.codeless.api.automation.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +15,7 @@ public class Test {
   @Id
   @GeneratedValue
   private Integer id;
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   private String name;
   @Column(nullable = false)
   private String json;

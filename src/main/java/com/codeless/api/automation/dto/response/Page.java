@@ -1,4 +1,4 @@
-package com.codeless.api.automation.test;
+package com.codeless.api.automation.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
@@ -7,12 +7,13 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = PageDto.PageDtoBuilder.class)
-public class PageDto<T> {
+@JsonDeserialize(builder = Page.PageBuilder.class)
+public class Page<T> {
 
   Integer numberOfElements;
   Integer size;
   Integer number;
   Integer totalPages;
+  Long totalElements;
   List<T> items;
 }
