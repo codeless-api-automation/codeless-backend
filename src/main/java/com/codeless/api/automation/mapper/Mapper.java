@@ -1,4 +1,4 @@
-package com.codeless.api.automation.function;
+package com.codeless.api.automation.mapper;
 
 public interface Mapper<T, S> {
 

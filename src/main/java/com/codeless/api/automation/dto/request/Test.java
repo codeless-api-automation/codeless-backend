@@ -12,7 +12,7 @@ import lombok.Value;
 @JsonDeserialize(builder = Test.TestBuilder.class)
 public class Test {
 
-  Integer id;
+  Long id;
   @NotBlank String name;
   @NotNull Map<Object, Object> json;
 }

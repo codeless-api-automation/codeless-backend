@@ -1,11 +1,12 @@
-package com.codeless.api.automation.service;
+package com.codeless.api.automation.service.impl;
 
 import static java.util.stream.Collectors.toList;
 
 import com.codeless.api.automation.dto.response.Page;
 import com.codeless.api.automation.dto.request.Test;
-import com.codeless.api.automation.function.Mapper;
+import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
+import com.codeless.api.automation.service.TestService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
