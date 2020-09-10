@@ -6,6 +6,7 @@ import static com.codeless.api.automation.util.RestApiConstant.REGION_RESOURCE;
 import com.codeless.api.automation.dto.request.Region;
 import com.codeless.api.automation.service.RegionService;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(REGION_RESOURCE)
 @Validated
+@AllArgsConstructor
 public class RegionController {
 
-  @Autowired
-  private RegionService regionService;
+  private final RegionService regionService;
 
   @RequestMapping(method = RequestMethod.GET)
   public List<Region> getAllRegions() {

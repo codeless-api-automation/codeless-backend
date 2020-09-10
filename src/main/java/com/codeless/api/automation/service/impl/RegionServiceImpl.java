@@ -7,16 +7,15 @@ import com.codeless.api.automation.mapper.RegionMapper;
 import com.codeless.api.automation.repository.RegionRepository;
 import com.codeless.api.automation.service.RegionService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class RegionServiceImpl implements RegionService {
 
-  @Autowired
-  private RegionRepository regionRepository;
-  @Autowired
-  private RegionMapper regionToRegionDtoMapper;
+  private final RegionRepository regionRepository;
+  private final RegionMapper regionToRegionDtoMapper;
 
   @Override
   public List<Region> getAllRegions() {

@@ -12,7 +12,7 @@ import lombok.Value;
 @JsonDeserialize(builder = Execution.ExecutionBuilder.class)
 public class Execution {
 
-  Long id;
+  Long executionId;
   @NotNull Region region;
   @NotEmpty List<Test> tests;
 }

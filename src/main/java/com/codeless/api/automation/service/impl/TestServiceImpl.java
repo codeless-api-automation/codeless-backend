@@ -8,19 +8,18 @@ import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class TestServiceImpl implements TestService {
 
-  @Autowired
-  private Mapper<Test, com.codeless.api.automation.entity.Test> testDtoToTestMapper;
-  @Autowired
-  private Mapper<com.codeless.api.automation.entity.Test, Test> testToTestDtoMapper;
-  @Autowired
-  private TestRepository testRepository;
+  private final Mapper<Test, com.codeless.api.automation.entity.Test> testDtoToTestMapper;
+  private final Mapper<com.codeless.api.automation.entity.Test, Test> testToTestDtoMapper;
+  private final TestRepository testRepository;
 
   @Override
   public Test saveTest(Test testDto) {

@@ -8,6 +8,7 @@ import com.codeless.api.automation.dto.request.Test;
 import com.codeless.api.automation.service.TestService;
 import java.net.URI;
 import javax.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(TEST_RESOURCE)
 @Validated
+@AllArgsConstructor
 public class TestController {
 
-  @Autowired
-  private TestService testService;
+  private final TestService testService;
 
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity<Test> createTest(@RequestBody @Valid Test test) {
