@@ -2,14 +2,14 @@ package com.codeless.api.automation.service.impl;
 
 import static java.util.stream.Collectors.toList;
 
-import com.codeless.api.automation.dto.response.Page;
 import com.codeless.api.automation.dto.request.Test;
+import com.codeless.api.automation.dto.response.Page;
 import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -43,5 +43,12 @@ public class TestServiceImpl implements TestService {
         .numberOfElements(tests.getNumberOfElements())
         .items(dtoTests)
         .build();
+  }
+
+  @Override
+  public void deleteTests(List<Test> tests) {
+    testRepository.deleteAll(tests.stream()
+        .map(testDtoToTestMapper::map)
+        .collect(Collectors.toList()));
   }
 }

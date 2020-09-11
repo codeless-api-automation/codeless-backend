@@ -1,6 +1,7 @@
 package com.codeless.api.automation.dto.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import javax.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Value;
 
@@ -10,9 +11,9 @@ import lombok.Value;
 public class Region {
 
   Long id;
-  String iso2;
-  String country;
-  String city;
+  @NotEmpty String iso2;
+  @NotEmpty String country;
+  @NotEmpty String city;
   boolean defaultRegion;
 
 }
