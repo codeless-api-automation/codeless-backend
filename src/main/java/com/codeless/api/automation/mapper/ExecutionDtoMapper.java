@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class ExecutionDtoMapper implements
     Mapper<com.codeless.api.automation.dto.request.Execution, Execution> {
 
-  private final TestDtoMapper testDtoMapper;
+  private final TestDtoToTestMapper testDtoMapper;
   private final RegionDtoMapper regionDtoMapper;
 
   @Override

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class TestDtoMapper implements Mapper<Test, com.codeless.api.automation.entity.Test> {
+public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automation.entity.Test> {
 
   private final ObjectMapper objectMapper;
 

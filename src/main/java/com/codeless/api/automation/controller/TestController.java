@@ -46,7 +46,7 @@ public class TestController {
     return testService.getAllTests(page, size);
   }
 
-  @RequestMapping(method = RequestMethod.DELETE)
+  @RequestMapping(method = RequestMethod.PATCH)
   public void deleteTests(@RequestBody @Valid @NotEmpty List<Test> tests) {
     testService.deleteTests(tests);
   }
