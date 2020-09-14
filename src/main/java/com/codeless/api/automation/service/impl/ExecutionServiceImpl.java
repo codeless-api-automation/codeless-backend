@@ -9,6 +9,7 @@ import com.codeless.api.automation.repository.ExecutionRepository;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.TestSuiteBuilderService;
 import com.google.common.collect.ImmutableList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     long executionId = taskOperations.launch(dataFlowConfiguration.getTestExecutionTaskName(),
         Collections.emptyMap(),
-        ImmutableList.of(String.format("suite=%s", testSuiteBuilderService.build(tests))),
+        ImmutableList.of(getTestSuiteArgument(testSuiteBuilderService.build(tests))),
         null);
 
     com.codeless.api.automation.entity.Execution preparedExecution =
@@ -48,5 +49,11 @@ public class ExecutionServiceImpl implements ExecutionService {
         .tests(execution.getTests())
         .executionId(executionId)
         .build();
+  }
+
+  private String getTestSuiteArgument(String testSuite) {
+    byte[] encodedTestSuite = Base64.getEncoder().encode(testSuite.getBytes());
+    final String testSuiteTaskArgument = "suite=%s";
+    return String.format(testSuiteTaskArgument, new String(encodedTestSuite));
   }
 }

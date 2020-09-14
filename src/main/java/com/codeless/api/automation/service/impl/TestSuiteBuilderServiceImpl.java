@@ -72,7 +72,9 @@ public class TestSuiteBuilderServiceImpl implements TestSuiteBuilderService {
   }
 
   private Element createSuite(Document document) {
-    return document.createElement("suite");
+    Element suiteNode = document.createElement("suite");
+    suiteNode.setAttribute("name", "codeless");
+    return suiteNode;
   }
 
   private Element createTest(Document document, Test test) {
