@@ -1,7 +1,7 @@
 package com.codeless.api.automation.service;
 
-import com.codeless.api.automation.dto.response.Page;
-import com.codeless.api.automation.dto.request.Test;
+import com.codeless.api.automation.dto.Page;
+import com.codeless.api.automation.dto.Test;
 import java.util.List;
 
 public interface TestService {

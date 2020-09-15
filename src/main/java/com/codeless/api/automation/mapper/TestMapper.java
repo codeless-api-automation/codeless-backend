@@ -1,6 +1,6 @@
 package com.codeless.api.automation.mapper;
 
-import com.codeless.api.automation.dto.request.Test;
+import com.codeless.api.automation.dto.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

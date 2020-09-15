@@ -4,10 +4,10 @@ import com.codeless.api.automation.entity.Region;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RegionDtoMapper implements Mapper<com.codeless.api.automation.dto.request.Region, Region> {
+public class RegionDtoMapper implements Mapper<com.codeless.api.automation.dto.Region, Region> {
 
   @Override
-  public Region map(com.codeless.api.automation.dto.request.Region source) {
+  public Region map(com.codeless.api.automation.dto.Region source) {
     Region region = new Region();
     region.setId(source.getId());
     region.setCity(source.getCity());

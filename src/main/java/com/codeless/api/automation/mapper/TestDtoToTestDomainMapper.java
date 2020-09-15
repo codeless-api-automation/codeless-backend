@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class TestDtoToTestDomainMapper implements Mapper<com.codeless.api.automation.dto.request.Test, Test> {
+public class TestDtoToTestDomainMapper implements Mapper<com.codeless.api.automation.dto.Test, Test> {
 
   private final ObjectMapper objectMapper;
 
   @Override
-  public Test map(com.codeless.api.automation.dto.request.Test source) {
+  public Test map(com.codeless.api.automation.dto.Test source) {
     return toTest(source.getJson());
   }
 

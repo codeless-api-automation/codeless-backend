@@ -1,6 +1,6 @@
 package com.codeless.api.automation.mapper;
 
-import com.codeless.api.automation.dto.request.Region;
+import com.codeless.api.automation.dto.Region;
 import com.codeless.api.automation.entity.Country;
 import org.springframework.stereotype.Service;
 

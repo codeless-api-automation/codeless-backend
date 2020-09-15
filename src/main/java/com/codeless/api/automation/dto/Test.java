@@ -1,4 +1,4 @@
-package com.codeless.api.automation.dto.request;
+package com.codeless.api.automation.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Map;

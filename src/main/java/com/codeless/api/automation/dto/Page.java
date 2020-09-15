@@ -1,4 +1,4 @@
-package com.codeless.api.automation.dto.response;
+package com.codeless.api.automation.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;

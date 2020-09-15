@@ -2,8 +2,8 @@ package com.codeless.api.automation.service.impl;
 
 import static java.util.stream.Collectors.toList;
 
-import com.codeless.api.automation.dto.request.Test;
-import com.codeless.api.automation.dto.response.Page;
+import com.codeless.api.automation.dto.Test;
+import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
