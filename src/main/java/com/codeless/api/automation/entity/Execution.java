@@ -25,7 +25,10 @@ public class Execution {
   @OneToOne
   @JoinColumn(name = "region", referencedColumnName = "id")
   private Region region;
-  @ManyToMany(mappedBy = "executions")
+  @ManyToMany(targetEntity = Test.class)
+  @JoinTable(name = "tests_executions",
+      joinColumns = {@JoinColumn(name = "execution_id")},
+      inverseJoinColumns = {@JoinColumn(name = "test_id")})
   private List<Test> tests;
   @Column
   private Long executionId;
