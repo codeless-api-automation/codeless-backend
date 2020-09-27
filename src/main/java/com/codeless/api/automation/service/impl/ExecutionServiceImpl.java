@@ -52,6 +52,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         .region(execution.getRegion())
         .tests(execution.getTests())
         .executionId(executionId)
+        .name(execution.getName())
         .build();
   }
 

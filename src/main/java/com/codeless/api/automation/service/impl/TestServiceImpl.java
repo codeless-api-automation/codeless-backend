@@ -4,13 +4,16 @@ import static java.util.stream.Collectors.toList;
 
 import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.dto.Page;
+import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,8 +25,21 @@ public class TestServiceImpl implements TestService {
   private final TestRepository testRepository;
 
   @Override
+  public Test updateTest(Test testDto) {
+    Long testId = testDto.getId();
+    if (testId != null && testRepository.existsById(testId)) {
+      return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
+    }
+    throw new ApiException("The test is not created yet to be edited!",
+        HttpStatus.BAD_REQUEST.value());
+  }
+
+  @Override
   public Test saveTest(Test testDto) {
-    return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
+    if (testDto.getId() == null) {
+      return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
+    }
+    throw new ApiException("The id is not required!", HttpStatus.BAD_REQUEST.value());
   }
 
   @Override

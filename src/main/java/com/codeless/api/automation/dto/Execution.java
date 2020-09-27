@@ -14,5 +14,6 @@ public class Execution {
 
   Long executionId;
   @NotNull Region region;
+  @NotEmpty String name;
   @NotEmpty List<Test> tests;
 }

@@ -22,6 +22,8 @@ public class Execution {
   @Id
   @GeneratedValue
   private Long id;
+  @Column
+  private String name;
   @OneToOne
   @JoinColumn(name = "region", referencedColumnName = "id")
   private Region region;
