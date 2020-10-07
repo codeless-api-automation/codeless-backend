@@ -1,10 +1,10 @@
 package com.codeless.api.automation.entity;
 
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -24,6 +24,9 @@ public class Execution {
   private Long id;
   @Column
   private String name;
+  @Enumerated(EnumType.ORDINAL)
+  @Column
+  private ExecutionType type;
   @OneToOne
   @JoinColumn(name = "region", referencedColumnName = "id")
   private Region region;

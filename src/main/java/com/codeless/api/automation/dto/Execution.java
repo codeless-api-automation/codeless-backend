@@ -1,5 +1,6 @@
 package com.codeless.api.automation.dto;
 
+import com.codeless.api.automation.entity.ExecutionType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
@@ -13,6 +14,7 @@ import lombok.Value;
 public class Execution {
 
   Long executionId;
+  @NotNull ExecutionType type;
   @NotNull Region region;
   @NotEmpty String name;
   @NotEmpty List<Test> tests;

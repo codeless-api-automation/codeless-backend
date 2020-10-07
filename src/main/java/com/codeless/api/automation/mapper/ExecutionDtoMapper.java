@@ -17,6 +17,7 @@ public class ExecutionDtoMapper implements
   public Execution map(com.codeless.api.automation.dto.Execution source) {
     Execution preparedExecution = new Execution();
     preparedExecution.setName(source.getName());
+    preparedExecution.setType(source.getType());
     preparedExecution.setRegion(regionDtoMapper.map(source.getRegion()));
     preparedExecution.setTests(source.getTests().stream()
         .map(testDtoMapper::map)
