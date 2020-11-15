@@ -1,6 +1,7 @@
 package com.codeless.api.automation.entity;
 
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -27,6 +28,11 @@ public class Execution {
   @Enumerated(EnumType.ORDINAL)
   @Column
   private ExecutionType type;
+  @Enumerated(EnumType.ORDINAL)
+  @Column
+  private ExecutionStatus status;
+  @Column
+  private Long executionId;
   @OneToOne
   @JoinColumn(name = "region", referencedColumnName = "id")
   private Region region;
@@ -35,6 +41,11 @@ public class Execution {
       joinColumns = {@JoinColumn(name = "execution_id")},
       inverseJoinColumns = {@JoinColumn(name = "test_id")})
   private List<Test> tests;
-  @Column
-  private Long executionId;
+  @OneToOne(cascade = CascadeType.REMOVE)
+  @JoinTable(name = "execution_result",
+      joinColumns =
+          {@JoinColumn(name = "execution_id")},
+      inverseJoinColumns =
+          {@JoinColumn(name = "result_id", referencedColumnName = "execution_id")})
+  private Result result;
 }
