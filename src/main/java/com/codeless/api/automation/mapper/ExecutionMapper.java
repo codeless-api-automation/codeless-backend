@@ -2,11 +2,11 @@ package com.codeless.api.automation.mapper;
 
 import com.codeless.api.automation.entity.Execution;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExecutionMapper implements
     Mapper<Execution, com.codeless.api.automation.dto.Execution> {
 

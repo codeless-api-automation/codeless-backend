@@ -2,22 +2,21 @@ package com.codeless.api.automation.service.impl;
 
 import static java.util.stream.Collectors.toList;
 
-import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.dto.Page;
+import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
 
   private final Mapper<Test, com.codeless.api.automation.entity.Test> testDtoToTestMapper;

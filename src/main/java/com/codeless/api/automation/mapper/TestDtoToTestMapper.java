@@ -4,11 +4,11 @@ import com.codeless.api.automation.dto.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automation.entity.Test> {
 
   private final ObjectMapper objectMapper;

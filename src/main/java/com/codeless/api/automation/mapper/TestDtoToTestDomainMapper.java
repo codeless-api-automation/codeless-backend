@@ -4,11 +4,11 @@ package com.codeless.api.automation.mapper;
 import com.codeless.api.automation.domain.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestDtoToTestDomainMapper implements Mapper<com.codeless.api.automation.dto.Test, Test> {
 
   private final ObjectMapper objectMapper;

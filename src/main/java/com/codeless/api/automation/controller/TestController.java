@@ -3,14 +3,14 @@ package com.codeless.api.automation.controller;
 import static com.codeless.api.automation.util.RestApiConstant.SINGLE_TEST_RESOURCE_WITH_ROOT_PATH;
 import static com.codeless.api.automation.util.RestApiConstant.TEST_RESOURCE;
 
-import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.dto.Page;
+import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.service.TestService;
 import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(TEST_RESOURCE)
 @Validated
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestController {
 
   private final TestService testService;

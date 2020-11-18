@@ -7,11 +7,11 @@ import com.codeless.api.automation.mapper.RegionMapper;
 import com.codeless.api.automation.repository.RegionRepository;
 import com.codeless.api.automation.service.RegionService;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RegionServiceImpl implements RegionService {
 
   private final RegionRepository regionRepository;

@@ -7,7 +7,7 @@ import com.codeless.api.automation.dto.Execution;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.service.ExecutionService;
 import javax.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(EXECUTION_RESOURCE)
 @Validated
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExecutionController {
 
   private final ExecutionService executionService;
