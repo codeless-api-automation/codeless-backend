@@ -10,5 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class DataFlowConfiguration {
 
   private String baseURI;
-  private String testExecutionTaskName;
+  private String taskName;
+  private String definitionName;
 }

@@ -18,6 +18,7 @@ public class ExecutionDtoMapper implements
     Execution preparedExecution = new Execution();
     preparedExecution.setName(source.getName());
     preparedExecution.setType(source.getType());
+    preparedExecution.setStatus(source.getExecutionStatus());
     preparedExecution.setRegion(regionDtoMapper.map(source.getRegion()));
     preparedExecution.setTests(source.getTests().stream()
         .map(testDtoMapper::map)

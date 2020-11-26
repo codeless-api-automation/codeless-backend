@@ -17,6 +17,7 @@ public class ExecutionMapper implements
   public com.codeless.api.automation.dto.Execution map(Execution source) {
     return com.codeless.api.automation.dto.Execution.builder()
         .executionId(source.getExecutionId())
+        .executionStatus(source.getStatus())
         .type(source.getType())
         .name(source.getName())
         .region(regionMapper.map(source.getRegion()))

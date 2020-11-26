@@ -1,5 +1,6 @@
 package com.codeless.api.automation.dto;
 
+import com.codeless.api.automation.entity.ExecutionStatus;
 import com.codeless.api.automation.entity.ExecutionType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
@@ -18,4 +19,5 @@ public class Execution {
   @NotNull Region region;
   @NotEmpty String name;
   @NotEmpty List<Test> tests;
+  ExecutionStatus executionStatus;
 }
