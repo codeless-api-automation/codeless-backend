@@ -12,7 +12,8 @@ import lombok.Value;
 @JsonDeserialize(builder = Execution.ExecutionBuilder.class)
 public class Schedule {
 
-  @NotEmpty String name;
+  @NotEmpty String scheduleName;
   @NotEmpty List<Test> tests;
   @NotNull Region region;
+  Long id;
 }
