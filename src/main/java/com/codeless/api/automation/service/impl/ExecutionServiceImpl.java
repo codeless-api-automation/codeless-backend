@@ -14,11 +14,9 @@ import com.codeless.api.automation.mapper.TestDtoToTestDomainMapper;
 import com.codeless.api.automation.repository.ExecutionRepository;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.TestSuiteBuilderService;
+import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.dataflow.rest.client.TaskOperations;
@@ -30,10 +28,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExecutionServiceImpl implements ExecutionService {
 
-  private static final String BACK_OFF_LIMIT = "deployer.%s.kubernetes.backoffLimit";
-
   private final TaskOperations taskOperations;
   private final DataFlowConfiguration dataFlowConfiguration;
+  private final TaskLaunchArgumentsService taskLaunchArgumentsService;
   private final TestDtoToTestDomainMapper testDtoToTestDomainMapper;
   private final TestSuiteBuilderService testSuiteBuilderService;
   private final ExecutionRepository executionRepository;
@@ -48,8 +45,9 @@ public class ExecutionServiceImpl implements ExecutionService {
         .collect(Collectors.toList());
 
     long executionId = taskOperations.launch(dataFlowConfiguration.getTaskName(),
-        getProperties(),
-        ImmutableList.of(getTestSuiteArgument(testSuiteBuilderService.build(tests))),
+        taskLaunchArgumentsService.getProperties(),
+        ImmutableList.of(
+            taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests))),
         null);
 
     com.codeless.api.automation.entity.Execution preparedExecution =
@@ -88,15 +86,4 @@ public class ExecutionServiceImpl implements ExecutionService {
     return executionResultMapper.map(execution);
   }
 
-  private String getTestSuiteArgument(String testSuite) {
-    byte[] encodedTestSuite = Base64.getEncoder().encode(testSuite.getBytes());
-    final String testSuiteTaskArgument = "suite=%s";
-    return String.format(testSuiteTaskArgument, new String(encodedTestSuite));
-  }
-
-  private Map<String, String> getProperties() {
-    return ImmutableMap.<String, String>builder()
-        .put(String.format(BACK_OFF_LIMIT, dataFlowConfiguration.getDefinitionName()), "0")
-        .build();
-  }
 }

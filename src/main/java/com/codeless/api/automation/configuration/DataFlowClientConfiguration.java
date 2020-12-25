@@ -4,6 +4,7 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.dataflow.rest.client.DataFlowOperations;
 import org.springframework.cloud.dataflow.rest.client.DataFlowTemplate;
+import org.springframework.cloud.dataflow.rest.client.SchedulerOperations;
 import org.springframework.cloud.dataflow.rest.client.TaskOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,11 @@ public class DataFlowClientConfiguration {
   @Bean
   public DataFlowOperations dataFlowTemplate() {
     return new DataFlowTemplate(URI.create(dataFlowConfiguration.getBaseURI()));
+  }
+
+  @Bean
+  public SchedulerOperations schedulerOperations(DataFlowOperations dataFlowOperations) {
+    return dataFlowOperations.schedulerOperations();
   }
 
   @Bean
