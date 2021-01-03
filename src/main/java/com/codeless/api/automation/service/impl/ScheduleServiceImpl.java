@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
-  private static final String CRON_EXPRESSION = "spring.cloud.scheduler.cron.expression";
+  private static final String CRON_EXPRESSION = "scheduler.cron.expression";
 
   private final SchedulerOperations schedulerOperations;
   private final DataFlowConfiguration dataFlowConfiguration;
@@ -39,7 +39,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     schedulerOperations.schedule(
         schedule.getScheduleName(),
-        dataFlowConfiguration.getDefinitionName(),
+        dataFlowConfiguration.getTaskName(),
         ImmutableMap.<String, String>builder()
             .putAll(taskLaunchArgumentsService.getProperties())
             .put(CRON_EXPRESSION, "*/5 * * * *")

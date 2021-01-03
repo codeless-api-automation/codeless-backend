@@ -9,7 +9,7 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = Execution.ExecutionBuilder.class)
+@JsonDeserialize(builder = Schedule.ScheduleBuilder.class)
 public class Schedule {
 
   @NotEmpty String scheduleName;
