@@ -11,7 +11,9 @@ import com.codeless.api.automation.service.TestSuiteBuilderService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.dataflow.rest.client.SchedulerOperations;
@@ -37,8 +39,11 @@ public class ScheduleServiceImpl implements ScheduleService {
         .map(testDtoToTestDomainMapper::map)
         .collect(Collectors.toList());
 
-    schedulerOperations.schedule(
-        schedule.getScheduleName(),
+    String internalScheduleName =
+        UUID.nameUUIDFromBytes(schedule.getScheduleName().getBytes(StandardCharsets.UTF_8))
+            .toString();
+
+    schedulerOperations.schedule(internalScheduleName,
         dataFlowConfiguration.getTaskName(),
         ImmutableMap.<String, String>builder()
             .putAll(taskLaunchArgumentsService.getProperties())
@@ -49,8 +54,12 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .getTestSuiteArgument(testSuiteBuilderService.build(tests)))
             .build());
 
+    com.codeless.api.automation.entity.Schedule preparedSchedule =
+        scheduleDtoMapper.map(schedule);
+    preparedSchedule.setInternalName(internalScheduleName);
+
     com.codeless.api.automation.entity.Schedule persistedSchedule =
-        scheduleRepository.save(scheduleDtoMapper.map(schedule));
+        scheduleRepository.save(preparedSchedule);
 
     return Schedule.builder()
         .scheduleName(schedule.getScheduleName())
