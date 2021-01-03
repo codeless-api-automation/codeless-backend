@@ -23,6 +23,7 @@ import org.springframework.cloud.dataflow.rest.client.TaskOperations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,27 +40,29 @@ public class ExecutionServiceImpl implements ExecutionService {
   private final ExecutionResultMapper executionResultMapper;
 
   @Override
+  @Transactional
   public Execution runExecution(Execution execution) {
     List<Test> tests = execution.getTests().stream()
         .map(testDtoToTestDomainMapper::map)
         .collect(Collectors.toList());
 
-    long executionId = taskOperations.launch(dataFlowConfiguration.getTaskName(),
-        taskLaunchArgumentsService.getProperties(),
-        ImmutableList.of(
-            taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests))),
-        null);
-
     com.codeless.api.automation.entity.Execution preparedExecution =
         executionDtoMapper.map(execution);
     preparedExecution.setStatus(ExecutionStatus.PENDING);
-    preparedExecution.setExecutionId(executionId);
+    com.codeless.api.automation.entity.Execution persistedExecution =
+        executionRepository.save(preparedExecution);
 
-    executionRepository.save(preparedExecution);
+    taskOperations.launch(dataFlowConfiguration.getTaskName(),
+        taskLaunchArgumentsService.getProperties(),
+        ImmutableList.of(
+            taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests)),
+            taskLaunchArgumentsService.getExecutionIdArgument(persistedExecution.getId())),
+        null);
+
     return Execution.builder()
+        .id(persistedExecution.getId())
         .region(execution.getRegion())
         .tests(execution.getTests())
-        .executionId(executionId)
         .name(execution.getName())
         .build();
   }
@@ -80,7 +83,7 @@ public class ExecutionServiceImpl implements ExecutionService {
   @Override
   public ExecutionResult getExecutionResult(long executionId) {
     com.codeless.api.automation.entity.Execution execution = executionRepository
-        .findByExecutionId(executionId)
+        .findById(executionId)
         .orElseThrow(
             () -> new ApiException("The execution is not found!", HttpStatus.BAD_REQUEST.value()));
     return executionResultMapper.map(execution);

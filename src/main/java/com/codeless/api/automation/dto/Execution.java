@@ -14,7 +14,7 @@ import lombok.Value;
 @JsonDeserialize(builder = Execution.ExecutionBuilder.class)
 public class Execution {
 
-  Long executionId;
+  Long id;
   @NotNull ExecutionType type;
   @NotNull Region region;
   @NotEmpty String name;

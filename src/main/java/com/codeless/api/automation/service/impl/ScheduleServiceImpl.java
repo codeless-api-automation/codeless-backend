@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.dataflow.rest.client.SchedulerOperations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,14 +43,22 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final CronExpressionBuilderService cronExpressionBuilderService;
 
   @Override
+  @Transactional
   public Schedule runSchedule(Schedule schedule) {
     List<Test> tests = schedule.getTests().stream()
         .map(testDtoToTestDomainMapper::map)
         .collect(Collectors.toList());
 
-    String internalScheduleName =
+    final String internalScheduleName =
         UUID.nameUUIDFromBytes(schedule.getScheduleName().getBytes(StandardCharsets.UTF_8))
             .toString();
+
+    com.codeless.api.automation.entity.Schedule preparedSchedule =
+        scheduleDtoMapper.map(schedule);
+    preparedSchedule.setInternalName(internalScheduleName);
+
+    com.codeless.api.automation.entity.Schedule persistedSchedule =
+        scheduleRepository.save(preparedSchedule);
 
     schedulerOperations.schedule(internalScheduleName,
         dataFlowConfiguration.getTaskName(),
@@ -61,14 +70,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         ImmutableList.<String>builder()
             .add(taskLaunchArgumentsService
                 .getTestSuiteArgument(testSuiteBuilderService.build(tests)))
+            .add(taskLaunchArgumentsService
+                .getScheduleIdArgument(persistedSchedule.getId()))
             .build());
-
-    com.codeless.api.automation.entity.Schedule preparedSchedule =
-        scheduleDtoMapper.map(schedule);
-    preparedSchedule.setInternalName(internalScheduleName);
-
-    com.codeless.api.automation.entity.Schedule persistedSchedule =
-        scheduleRepository.save(preparedSchedule);
 
     return Schedule.builder()
         .scheduleName(schedule.getScheduleName())
