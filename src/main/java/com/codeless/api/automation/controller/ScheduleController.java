@@ -2,15 +2,18 @@ package com.codeless.api.automation.controller;
 
 import static com.codeless.api.automation.util.RestApiConstant.SCHEDULES_RESOURCE;
 
+import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Schedule;
 import com.codeless.api.automation.service.ScheduleService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
@@ -25,6 +28,12 @@ public class ScheduleController {
   @PostMapping
   public Schedule createSchedule(@RequestBody @Valid Schedule schedule) {
     return scheduleService.runSchedule(schedule);
+  }
+
+  @GetMapping
+  public Page<Schedule> getSchedules(@RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "5") Integer size) {
+    return scheduleService.getSchedules(page, size);
   }
 
 }
