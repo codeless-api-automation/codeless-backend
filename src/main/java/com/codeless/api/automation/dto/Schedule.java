@@ -15,5 +15,6 @@ public class Schedule {
   @NotEmpty String scheduleName;
   @NotEmpty List<Test> tests;
   @NotNull Region region;
+  @NotNull Timer timer;
   Long id;
 }

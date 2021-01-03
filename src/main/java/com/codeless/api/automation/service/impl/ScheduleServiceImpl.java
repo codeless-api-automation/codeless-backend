@@ -1,11 +1,14 @@
 package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.configuration.DataFlowConfiguration;
+import com.codeless.api.automation.context.CronExpressionContext;
 import com.codeless.api.automation.domain.Test;
 import com.codeless.api.automation.dto.Schedule;
 import com.codeless.api.automation.mapper.ScheduleDtoMapper;
 import com.codeless.api.automation.mapper.TestDtoToTestDomainMapper;
+import com.codeless.api.automation.mapper.TimerDtoToContextMapper;
 import com.codeless.api.automation.repository.ScheduleRepository;
+import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.ScheduleService;
 import com.codeless.api.automation.service.TestSuiteBuilderService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
@@ -31,7 +34,9 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final TestSuiteBuilderService testSuiteBuilderService;
   private final TestDtoToTestDomainMapper testDtoToTestDomainMapper;
   private final ScheduleDtoMapper scheduleDtoMapper;
+  private final TimerDtoToContextMapper timerDtoToContextMapper;
   private final ScheduleRepository scheduleRepository;
+  private final CronExpressionBuilderService cronExpressionBuilderService;
 
   @Override
   public Schedule runSchedule(Schedule schedule) {
@@ -47,7 +52,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         dataFlowConfiguration.getTaskName(),
         ImmutableMap.<String, String>builder()
             .putAll(taskLaunchArgumentsService.getProperties())
-            .put(CRON_EXPRESSION, "*/5 * * * *")
+            .put(CRON_EXPRESSION, cronExpressionBuilderService
+                .buildCronExpression(timerDtoToContextMapper.map(schedule.getTimer())))
             .build(),
         ImmutableList.<String>builder()
             .add(taskLaunchArgumentsService
@@ -65,6 +71,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         .scheduleName(schedule.getScheduleName())
         .region(schedule.getRegion())
         .tests(schedule.getTests())
+        .timer(schedule.getTimer())
         .id(persistedSchedule.getId())
         .build();
   }
