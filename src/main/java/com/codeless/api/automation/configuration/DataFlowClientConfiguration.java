@@ -17,16 +17,19 @@ public class DataFlowClientConfiguration {
 
   @Bean
   public DataFlowOperations dataFlowTemplate() {
-    return new DataFlowTemplate(URI.create(dataFlowConfiguration.getBaseURI()));
+    // return new DataFlowTemplate(URI.create(dataFlowConfiguration.getBaseURI()));
+    return null;
   }
 
   @Bean
   public SchedulerOperations schedulerOperations(DataFlowOperations dataFlowOperations) {
-    return dataFlowOperations.schedulerOperations();
+  //  return dataFlowOperations.schedulerOperations();
+    return null;
   }
 
   @Bean
   public TaskOperations taskOperations(DataFlowOperations dataFlowOperations) {
-    return dataFlowOperations.taskOperations();
+   // return dataFlowOperations.taskOperations();
+    return null;
   }
 }
