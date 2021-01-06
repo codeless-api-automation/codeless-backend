@@ -27,19 +27,63 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ExecutionServiceImpl implements ExecutionService {
+
+  private final TaskOperations taskOperations;
+  private final DataFlowConfiguration dataFlowConfiguration;
+  private final TaskLaunchArgumentsService taskLaunchArgumentsService;
+  private final TestDtoToTestDomainMapper testDtoToTestDomainMapper;
+  private final TestSuiteBuilderService testSuiteBuilderService;
+  private final ExecutionRepository executionRepository;
+  private final ExecutionDtoMapper executionDtoMapper;
+  private final ExecutionMapper executionMapper;
+  private final ExecutionResultMapper executionResultMapper;
+
   @Override
   public Execution runExecution(Execution execution) {
-    return null;
+    List<Test> tests = execution.getTests().stream()
+        .map(testDtoToTestDomainMapper::map)
+        .collect(Collectors.toList());
+
+    long executionId = taskOperations.launch(dataFlowConfiguration.getTaskName(),
+        taskLaunchArgumentsService.getProperties(),
+        ImmutableList.of(
+            taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests))),
+        null);
+
+    com.codeless.api.automation.entity.Execution preparedExecution =
+        executionDtoMapper.map(execution);
+    preparedExecution.setStatus(ExecutionStatus.PENDING);
+    preparedExecution.setExecutionId(executionId);
+
+    executionRepository.save(preparedExecution);
+    return Execution.builder()
+        .region(execution.getRegion())
+        .tests(execution.getTests())
+        .executionId(executionId)
+        .name(execution.getName())
+        .build();
   }
 
   @Override
   public Page<Execution> getExecutions(Integer page, Integer size) {
-    return null;
+    org.springframework.data.domain.Page<com.codeless.api.automation.entity.Execution> executions =
+        executionRepository.findAll(PageRequest.of(page, size));
+
+    List<Execution> executionsDto = executions.getContent().stream()
+        .map(executionMapper::map)
+        .collect(Collectors.toList());
+    return Page.<Execution>builder()
+        .items(executionsDto)
+        .build();
   }
 
   @Override
   public ExecutionResult getExecutionResult(long executionId) {
-    return null;
+    com.codeless.api.automation.entity.Execution execution = executionRepository
+        .findByExecutionId(executionId)
+        .orElseThrow(
+            () -> new ApiException("The execution is not found!", HttpStatus.BAD_REQUEST.value()));
+    return executionResultMapper.map(execution);
   }
 
 }
