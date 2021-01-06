@@ -21,9 +21,42 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
+  private static final String CRON_EXPRESSION = "spring.cloud.scheduler.cron.expression";
+
+  private final SchedulerOperations schedulerOperations;
+  private final DataFlowConfiguration dataFlowConfiguration;
+  private final TaskLaunchArgumentsService taskLaunchArgumentsService;
+  private final TestSuiteBuilderService testSuiteBuilderService;
+  private final TestDtoToTestDomainMapper testDtoToTestDomainMapper;
+  private final ScheduleDtoMapper scheduleDtoMapper;
+  private final ScheduleRepository scheduleRepository;
+
   @Override
   public Schedule runSchedule(Schedule schedule) {
-    return null;
-  }
+    List<Test> tests = schedule.getTests().stream()
+        .map(testDtoToTestDomainMapper::map)
+        .collect(Collectors.toList());
 
+    schedulerOperations.schedule(
+        schedule.getScheduleName(),
+        dataFlowConfiguration.getDefinitionName(),
+        ImmutableMap.<String, String>builder()
+            .putAll(taskLaunchArgumentsService.getProperties())
+            .put(CRON_EXPRESSION, "*/5 * * * *")
+            .build(),
+        ImmutableList.<String>builder()
+            .add(taskLaunchArgumentsService
+                .getTestSuiteArgument(testSuiteBuilderService.build(tests)))
+            .build());
+
+    com.codeless.api.automation.entity.Schedule persistedSchedule =
+        scheduleRepository.save(scheduleDtoMapper.map(schedule));
+
+    return Schedule.builder()
+        .scheduleName(schedule.getScheduleName())
+        .region(schedule.getRegion())
+        .tests(schedule.getTests())
+        .id(persistedSchedule.getId())
+        .build();
+  }
 }
