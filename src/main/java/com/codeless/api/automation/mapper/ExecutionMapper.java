@@ -16,7 +16,7 @@ public class ExecutionMapper implements
   @Override
   public com.codeless.api.automation.dto.Execution map(Execution source) {
     return com.codeless.api.automation.dto.Execution.builder()
-        .executionId(source.getExecutionId())
+        .id(source.getId())
         .executionStatus(source.getStatus())
         .type(source.getType())
         .name(source.getName())
