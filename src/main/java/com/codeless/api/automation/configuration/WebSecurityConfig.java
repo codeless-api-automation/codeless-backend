@@ -1,4 +1,4 @@
-package com.codeless.api.automation.security.config;
+package com.codeless.api.automation.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
