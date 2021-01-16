@@ -1,7 +1,7 @@
 package com.codeless.api.automation.controller.security;
 
-import com.codeless.api.automation.entity.security.UserDto;
-import com.codeless.api.automation.entity.security.View;
+import com.codeless.api.automation.dto.AppUser;
+import com.codeless.api.automation.dto.View;
 import com.codeless.api.automation.service.security.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import javax.validation.Valid;
@@ -20,7 +20,7 @@ public class UserController {
 
   @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
   @JsonView(View.ALLOWED.class)
-  public UserDto register(@Valid @RequestBody UserDto userDto) {
-    return userService.saveUser(userDto);
+  public AppUser register(@Valid @RequestBody AppUser appUser) {
+    return userService.saveUser(appUser);
   }
 }

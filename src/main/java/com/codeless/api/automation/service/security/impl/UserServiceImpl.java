@@ -1,7 +1,7 @@
 package com.codeless.api.automation.service.security.impl;
 
+import com.codeless.api.automation.dto.AppUser;
 import com.codeless.api.automation.entity.security.User;
-import com.codeless.api.automation.entity.security.UserDto;
 import com.codeless.api.automation.entity.security.UserRole;
 import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.security.UserService;
@@ -33,16 +33,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     throw new UsernameNotFoundException("User not exist with name :" + username);
   }
 
-  public UserDto saveUser(UserDto userDto) {
-    userRepository.save(encodeUser(userDto));
-    log.info("User with name: '{}' created successfully", userDto.getUsername());
-    return userDto;
+  public AppUser saveUser(AppUser appUser) {
+    userRepository.save(encodeUser(appUser));
+    log.info("User with name: '{}' created successfully", appUser.getUsername());
+    return appUser;
   }
 
-  private User encodeUser(UserDto userDto) {
-    String password = passwordEncoder.encode(userDto.getPassword());
+  private User encodeUser(AppUser appUser) {
+    String password = passwordEncoder.encode(appUser.getPassword());
     return new User()
-        .setUsername(userDto.getUsername())
+        .setUsername(appUser.getUsername())
         .setPassword(password)
         .setRole(UserRole.ROLE_USER)
         .setEnabled(true)

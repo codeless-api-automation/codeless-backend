@@ -1,8 +1,8 @@
 package com.codeless.api.automation.service.security;
 
-import com.codeless.api.automation.entity.security.UserDto;
+import com.codeless.api.automation.dto.AppUser;
 
 public interface UserService {
 
-  UserDto saveUser(UserDto userDto);
+  AppUser saveUser(AppUser appUser);
 }
