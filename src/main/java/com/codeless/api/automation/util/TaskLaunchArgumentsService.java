@@ -27,6 +27,11 @@ public class TaskLaunchArgumentsService {
         .build();
   }
 
+  public String getExecutionTypeArgument(String executionType) {
+    final String executionTypeArgument = "executionType=%s";
+    return String.format(executionTypeArgument, executionType);
+  }
+
   public String getScheduleIdArgument(Long scheduleId) {
     final String scheduleIdTaskArgument = "scheduleId=%s";
     return String.format(scheduleIdTaskArgument, scheduleId);

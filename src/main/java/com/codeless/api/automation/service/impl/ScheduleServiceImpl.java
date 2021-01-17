@@ -4,6 +4,7 @@ import com.codeless.api.automation.configuration.DataFlowConfiguration;
 import com.codeless.api.automation.domain.Test;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Schedule;
+import com.codeless.api.automation.entity.ExecutionType;
 import com.codeless.api.automation.mapper.ScheduleDtoMapper;
 import com.codeless.api.automation.mapper.ScheduleMapper;
 import com.codeless.api.automation.mapper.TestDtoToTestDomainMapper;
@@ -72,6 +73,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .getTestSuiteArgument(testSuiteBuilderService.build(tests)))
             .add(taskLaunchArgumentsService
                 .getScheduleIdArgument(persistedSchedule.getId()))
+            .add(taskLaunchArgumentsService
+                .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()))
             .build());
 
     return Schedule.builder()

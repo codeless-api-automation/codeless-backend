@@ -6,6 +6,7 @@ import com.codeless.api.automation.dto.Execution;
 import com.codeless.api.automation.dto.ExecutionResult;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.entity.ExecutionStatus;
+import com.codeless.api.automation.entity.ExecutionType;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.mapper.ExecutionDtoMapper;
 import com.codeless.api.automation.mapper.ExecutionMapper;
@@ -56,7 +57,9 @@ public class ExecutionServiceImpl implements ExecutionService {
         taskLaunchArgumentsService.getProperties(),
         ImmutableList.of(
             taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests)),
-            taskLaunchArgumentsService.getExecutionIdArgument(persistedExecution.getId())),
+            taskLaunchArgumentsService.getExecutionIdArgument(persistedExecution.getId()),
+            taskLaunchArgumentsService
+                .getExecutionTypeArgument(ExecutionType.MANUAL_EXECUTION.getName())),
         null);
 
     return Execution.builder()
