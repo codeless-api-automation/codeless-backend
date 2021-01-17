@@ -1,10 +1,10 @@
-package com.codeless.api.automation.service.security.impl;
+package com.codeless.api.automation.service.impl;
 
-import com.codeless.api.automation.dto.AppUser;
-import com.codeless.api.automation.entity.security.User;
-import com.codeless.api.automation.entity.security.UserRole;
+import com.codeless.api.automation.dto.UserRegistration;
+import com.codeless.api.automation.entity.User;
+import com.codeless.api.automation.entity.UserRole;
 import com.codeless.api.automation.repository.UserRepository;
-import com.codeless.api.automation.service.security.UserService;
+import com.codeless.api.automation.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,16 +33,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     throw new UsernameNotFoundException("User not exist with name :" + username);
   }
 
-  public AppUser saveUser(AppUser appUser) {
-    userRepository.save(encodeUser(appUser));
-    log.info("User with name: '{}' created successfully", appUser.getUsername());
-    return appUser;
+  public void saveUser(UserRegistration userRegistration) {
+    userRepository.save(encodeUser(userRegistration));
+    log.info("User with name: '{}' created successfully", userRegistration.getUsername());
   }
 
-  private User encodeUser(AppUser appUser) {
-    String password = passwordEncoder.encode(appUser.getPassword());
+  private User encodeUser(UserRegistration userRegistration) {
+    String password = passwordEncoder.encode(userRegistration.getPassword());
     return new User()
-        .setUsername(appUser.getUsername())
+        .setUsername(userRegistration.getUsername())
         .setPassword(password)
         .setRole(UserRole.ROLE_USER)
         .setEnabled(true)
