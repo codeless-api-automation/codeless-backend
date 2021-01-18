@@ -1,6 +1,7 @@
 package com.codeless.api.automation.util;
 
 import com.codeless.api.automation.configuration.DataFlowConfiguration;
+import com.codeless.api.automation.constant.ArgumentConstant;
 import com.google.common.collect.ImmutableMap;
 import java.util.Base64;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class TaskLaunchArgumentsService {
 
   private static final String BACK_OFF_LIMIT = "deployer.%s.kubernetes.backoffLimit";
+  private static final String ARGUMENT_FORMAT = "%s=%s";
 
   private final DataFlowConfiguration dataFlowConfiguration;
 
@@ -28,18 +30,15 @@ public class TaskLaunchArgumentsService {
   }
 
   public String getExecutionTypeArgument(String executionType) {
-    final String executionTypeArgument = "executionType=%s";
-    return String.format(executionTypeArgument, executionType);
+    return String.format(ARGUMENT_FORMAT, ArgumentConstant.EXECUTION_ID, executionType);
   }
 
   public String getScheduleIdArgument(Long scheduleId) {
-    final String scheduleIdTaskArgument = "scheduleId=%s";
-    return String.format(scheduleIdTaskArgument, scheduleId);
+    return String.format(ARGUMENT_FORMAT, ArgumentConstant.SCHEDULE_ID, scheduleId);
   }
 
   public String getExecutionIdArgument(Long executionId) {
-    final String executionIdTaskArgument = "executionId=%s";
-    return String.format(executionIdTaskArgument, executionId);
+    return String.format(ARGUMENT_FORMAT, ArgumentConstant.EXECUTION_ID, executionId);
   }
 
 }
