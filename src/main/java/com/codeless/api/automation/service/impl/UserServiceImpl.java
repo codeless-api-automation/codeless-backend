@@ -35,14 +35,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   public void saveUser(UserRegistration userRegistration) {
     userRepository.save(encodeUser(userRegistration));
-    log.info("User with name: '{}' created successfully", userRegistration.getUsername());
+    log.info("User with name: '{}' created successfully", userRegistration.getEmail());
   }
 
   private User encodeUser(UserRegistration userRegistration) {
     String password = passwordEncoder.encode(userRegistration.getPassword());
     return new User()
-        .setUsername(userRegistration.getUsername())
+        .setUsername(userRegistration.getEmail())
         .setPassword(password)
+        .setFirstName(userRegistration.getFirstName())
+        .setLastName(userRegistration.getLastName())
         .setRole(UserRole.ROLE_USER)
         .setEnabled(true)
         .setAccountNonExpired(true)

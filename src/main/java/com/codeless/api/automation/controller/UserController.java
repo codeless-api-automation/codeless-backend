@@ -15,7 +15,7 @@ public class UserController {
 
   private final UserService userService;
 
-  @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
   public void register(@Valid @RequestBody UserRegistration userRegistration) {
     userService.saveUser(userRegistration);
   }

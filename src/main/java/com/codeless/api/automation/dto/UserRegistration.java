@@ -11,8 +11,14 @@ import lombok.experimental.Accessors;
 public class UserRegistration {
 
   @NotEmpty
+  private String firstName;
+
+  @NotEmpty
+  private String lastName;
+
+  @NotEmpty
   @Email
-  private String username;
+  private String email;
 
   @Size(max = 100, min = 5, message = "Invalid password size. Min - 5, Max - 100.")
   @NotEmpty
