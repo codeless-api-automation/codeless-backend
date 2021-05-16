@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       log.info("Find user with name: '{}'", username);
       return user;
     }
-    throw new UsernameNotFoundException("User not exist with name :" + username);
+    throw new UsernameNotFoundException("User does not exist with name :" + username);
   }
 
   public void saveUser(UserRegistration userRegistration) {
