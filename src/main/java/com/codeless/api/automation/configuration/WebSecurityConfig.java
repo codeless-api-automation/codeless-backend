@@ -1,5 +1,6 @@
 package com.codeless.api.automation.configuration;
 
+import com.codeless.api.automation.controller.fillter.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
+import org.springframework.security.web.session.SessionManagementFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -49,9 +51,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
+  @Bean
+  public CorsFilter corsFilter() {
+    return new CorsFilter();
+  }
+
   @Override
   protected void configure(final HttpSecurity http) throws Exception {
-    http.csrf().disable().authorizeRequests()
+    http.addFilterBefore(corsFilter(), SessionManagementFilter.class)
+        .csrf().disable().authorizeRequests()
         .antMatchers("/tests/**", "/executions/**", "/schedules/**", "/regions/**").authenticated()
         .antMatchers(HttpMethod.POST, "/users").permitAll()
         .and().httpBasic();

@@ -3,10 +3,12 @@ package com.codeless.api.automation.service.impl;
 import com.codeless.api.automation.dto.UserRegistration;
 import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.entity.UserRole;
+import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +36,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   }
 
   public void saveUser(UserRegistration userRegistration) {
+    User user = userRepository.findByUsername(userRegistration.getEmail());
+    if (user != null) {
+      throw new ApiException("Email is already in use!", HttpStatus.BAD_REQUEST.value());
+    }
     userRepository.save(encodeUser(userRegistration));
     log.info("User with name: '{}' created successfully", userRegistration.getEmail());
   }

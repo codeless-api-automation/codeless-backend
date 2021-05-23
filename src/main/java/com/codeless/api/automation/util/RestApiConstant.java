@@ -12,6 +12,7 @@ public final class RestApiConstant {
   public static final String SCHEDULES_RESOURCE = "/schedules";
   public static final String REGION_RESOURCE = "/regions";
   public static final String RESULT_RESOURCE = "/results";
+  public static final String AUTH_RESOURCE = "/auth";
 
   private RestApiConstant() {
   }
