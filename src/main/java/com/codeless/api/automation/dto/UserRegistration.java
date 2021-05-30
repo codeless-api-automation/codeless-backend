@@ -20,7 +20,7 @@ public class UserRegistration {
   @Email
   private String email;
 
-  @Size(max = 100, min = 5, message = "Invalid password size. Min - 5, Max - 100.")
+  @Size(max = 100, min = 5, message = "The email '${validatedValue}' must be between {min} and {max} characters long.")
   @NotEmpty
   private String password;
 }
