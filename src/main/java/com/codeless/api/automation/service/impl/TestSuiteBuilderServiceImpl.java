@@ -1,5 +1,6 @@
 package com.codeless.api.automation.service.impl;
 
+import com.codeless.api.automation.domain.Header;
 import com.codeless.api.automation.domain.Test;
 import com.codeless.api.automation.domain.Validator;
 import com.codeless.api.automation.domain.ValidatorAttribute;
@@ -39,24 +40,48 @@ public class TestSuiteBuilderServiceImpl implements TestSuiteBuilderService {
         Element testNode = createTest(document, test);
         suiteNode.appendChild(testNode);
 
-        List<Validator> validators = test.getValidators();
-        Map<String, List<Validator>> validatorsByName = getValidatorsByName(validators);
-        for (Entry<String, List<Validator>> validator : validatorsByName.entrySet()) {
-          Element validatorNode = createValidator(document, validator.getKey());
-          testNode.appendChild(validatorNode);
-
-          for (Validator rule : validator.getValue()) {
-            Element ruleNode = createRule(document, rule);
-            validatorNode.appendChild(ruleNode);
-          }
+        List<Header> headers = test.getHeaders();
+        if (headers != null) {
+          addHeaders(headers, document, testNode);
         }
 
+        List<Validator> validators = test.getValidators();
+        if (validators != null) {
+          addValidators(validators, document, testNode);
+        }
       }
       return toString(document);
 
     } catch (Exception exception) {
       throw new RuntimeException(exception);
     }
+  }
+
+  private void addHeaders(List<Header> headers, Document document, Element testNode) {
+    for (Header header : headers) {
+      Element headerNode = createHeader(document, header);
+      testNode.appendChild(headerNode);
+    }
+  }
+
+  private void addValidators(List<Validator> validators, Document document, Element testNode) {
+    Map<String, List<Validator>> validatorsByName = getValidatorsByName(validators);
+    for (Entry<String, List<Validator>> validator : validatorsByName.entrySet()) {
+      Element validatorNode = createValidator(document, validator.getKey());
+      testNode.appendChild(validatorNode);
+
+      for (Validator rule : validator.getValue()) {
+        Element ruleNode = createRule(document, rule);
+        validatorNode.appendChild(ruleNode);
+      }
+    }
+  }
+
+  private Element createHeader(Document document, Header header) {
+    Element headerNode = document.createElement("header");
+    headerNode.setAttribute("name", header.getName());
+    headerNode.setAttribute("value", header.getValue());
+    return headerNode;
   }
 
   private Map<String, List<Validator>> getValidatorsByName(List<Validator> validators) {

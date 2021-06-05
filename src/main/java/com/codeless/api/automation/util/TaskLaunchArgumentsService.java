@@ -30,7 +30,7 @@ public class TaskLaunchArgumentsService {
   }
 
   public String getExecutionTypeArgument(String executionType) {
-    return String.format(ARGUMENT_FORMAT, ArgumentConstant.EXECUTION_ID, executionType);
+    return String.format(ARGUMENT_FORMAT, ArgumentConstant.EXECUTION_TYPE, executionType);
   }
 
   public String getScheduleIdArgument(Long scheduleId) {

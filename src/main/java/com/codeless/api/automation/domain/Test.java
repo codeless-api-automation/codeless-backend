@@ -10,6 +10,7 @@ public class Test {
   private String httpMethod;
   private String requestURL;
   private String requestBody;
+  private List<Header> headers;
   private List<Validator> validators;
 
 }
