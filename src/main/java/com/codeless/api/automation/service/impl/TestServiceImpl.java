@@ -8,7 +8,10 @@ import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.mapper.Mapper;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +25,18 @@ public class TestServiceImpl implements TestService {
   private final Mapper<Test, com.codeless.api.automation.entity.Test> testDtoToTestMapper;
   private final Mapper<com.codeless.api.automation.entity.Test, Test> testToTestDtoMapper;
   private final TestRepository testRepository;
+  private final ObjectMapper objectMapper;
 
   @Override
   public Test updateTest(Test testDto) {
     Long testId = testDto.getId();
-    if (testId != null && testRepository.existsById(testId)) {
-      return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
+    if (testId != null) {
+      com.codeless.api.automation.entity.Test existingTest = testRepository.findById(testId)
+          .orElseThrow(
+              () -> new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value()));
+      existingTest.setName(testDto.getName());
+      existingTest.setJson(toString(testDto.getJson()));
+      return testToTestDtoMapper.map(testRepository.save(existingTest));
     }
     throw new ApiException("The test is not created yet to be edited!",
         HttpStatus.BAD_REQUEST.value());
@@ -65,5 +74,13 @@ public class TestServiceImpl implements TestService {
     testRepository.deleteAll(tests.stream()
         .map(testDtoToTestMapper::map)
         .collect(Collectors.toList()));
+  }
+
+  private String toString(Map<Object, Object> json) {
+    try {
+      return objectMapper.writeValueAsString(json);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException();
+    }
   }
 }
