@@ -2,7 +2,10 @@ package com.codeless.api.automation.mapper;
 
 import com.codeless.api.automation.dto.Timer;
 import com.codeless.api.automation.entity.Schedule;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -23,6 +26,9 @@ public class ScheduleMapper implements Mapper<Schedule, com.codeless.api.automat
         .id(source.getId())
         .scheduleName(source.getName())
         .region(regionMapper.map(source.getRegion()))
+        .emails(source.getEmails() == null ? Collections.emptyList()
+            : objectMapper.readValue(source.getEmails(), new TypeReference<List<String>>() {
+            }))
         .timer(objectMapper.readValue(source.getTimer(), Timer.class))
         .tests(source.getTests().stream()
             .map(testMapper::map)

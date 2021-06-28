@@ -41,7 +41,6 @@ public class ExecutionServiceImpl implements ExecutionService {
   private final ExecutionResultMapper executionResultMapper;
 
   @Override
-  @Transactional
   public Execution runExecution(Execution execution) {
     List<Test> tests = execution.getTests().stream()
         .map(testDtoToTestDomainMapper::map)

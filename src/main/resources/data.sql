@@ -3,7 +3,7 @@ VALUES
   ('US', 'US'),
   ('CA', 'Canada');
 
-INSERT INTO regions (city, default_region, country)
+INSERT INTO regions (city, default_region, country_id)
 VALUES
   ('San Francisco', true, (SELECT id FROM countries WHERE iso2 = 'US')),
   ('New York', false, (SELECT id FROM countries WHERE iso2 = 'US')),

@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public void saveUser(UserRegistration userRegistration) {
     User user = userRepository.findByUsername(userRegistration.getEmail());
     if (user != null) {
-      throw new ApiException("Email is already in use!", HttpStatus.BAD_REQUEST.value());
+      throw new ApiException("Email is already in use. Try another.", HttpStatus.BAD_REQUEST.value());
     }
     userRepository.save(encodeUser(userRegistration));
     log.info("User with name: '{}' created successfully", userRegistration.getEmail());

@@ -22,10 +22,12 @@ public class ScheduleDtoMapper implements
     com.codeless.api.automation.entity.Schedule scheduleEntity = new com.codeless.api.automation.entity.Schedule();
     scheduleEntity.setName(source.getScheduleName());
     scheduleEntity.setTimer(objectMapper.writeValueAsString(source.getTimer()));
+    scheduleEntity.setEmails(
+        source.getEmails() == null ? null : objectMapper.writeValueAsString(source.getEmails()));
     scheduleEntity.setRegion(regionDtoMapper.map(source.getRegion()));
     scheduleEntity.setTests(source.getTests().stream()
         .map(testDtoToTestMapper::map)
-        .collect(Collectors.toList()));
+        .collect(Collectors.toSet()));
     return scheduleEntity;
   }
 }

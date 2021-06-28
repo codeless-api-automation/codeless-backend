@@ -44,7 +44,6 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final CronExpressionBuilderService cronExpressionBuilderService;
 
   @Override
-  @Transactional
   public Schedule runSchedule(Schedule schedule) {
     List<Test> tests = schedule.getTests().stream()
         .map(testDtoToTestDomainMapper::map)
@@ -77,13 +76,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()))
             .build());
 
-    return Schedule.builder()
-        .scheduleName(schedule.getScheduleName())
-        .region(schedule.getRegion())
-        .tests(schedule.getTests())
-        .timer(schedule.getTimer())
-        .id(persistedSchedule.getId())
-        .build();
+    return scheduleMapper.map(persistedSchedule);
   }
 
   @Override

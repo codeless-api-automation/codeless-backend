@@ -13,6 +13,7 @@ public class Region {
   Long id;
   @NotEmpty String iso2;
   @NotEmpty String country;
+  @NotEmpty Long countryId;
   @NotEmpty String city;
   boolean defaultRegion;
 

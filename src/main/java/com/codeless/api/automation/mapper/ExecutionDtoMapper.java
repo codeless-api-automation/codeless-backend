@@ -22,7 +22,7 @@ public class ExecutionDtoMapper implements
     preparedExecution.setRegion(regionDtoMapper.map(source.getRegion()));
     preparedExecution.setTests(source.getTests().stream()
         .map(testDtoMapper::map)
-        .collect(Collectors.toList()));
+        .collect(Collectors.toSet()));
     return preparedExecution;
   }
 }

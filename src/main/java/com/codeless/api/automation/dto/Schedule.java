@@ -16,5 +16,6 @@ public class Schedule {
   @NotEmpty List<Test> tests;
   @NotNull Region region;
   @NotNull Timer timer;
+  List<String> emails;
   Long id;
 }
