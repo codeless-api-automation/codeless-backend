@@ -1,14 +1,19 @@
 package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.dto.UserRegistration;
+import com.codeless.api.automation.dto.UserVerification;
 import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.entity.UserRole;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.UserRepository;
+import com.codeless.api.automation.service.EmailService;
 import com.codeless.api.automation.service.UserService;
+import com.codeless.api.automation.util.VerificationUtil;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +28,7 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
   private final UserRepository userRepository;
+  private final EmailService emailService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
@@ -35,24 +41,37 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     throw new UsernameNotFoundException("User does not exist with name :" + username);
   }
 
-  public void saveUser(UserRegistration userRegistration) {
+  public User saveUser(UserRegistration userRegistration) {
     User user = userRepository.findByUsername(userRegistration.getEmail());
-    if (user != null) {
-      throw new ApiException("Email is already in use. Try another.", HttpStatus.BAD_REQUEST.value());
+    if (Objects.nonNull(user) && user.isEnabled()) {
+      throw new ApiException("User with this email is already in use. Try another.", HttpStatus.BAD_REQUEST.value());
     }
-    userRepository.save(encodeUser(userRegistration));
-    log.info("User with name: '{}' created successfully", userRegistration.getEmail());
+    User encodedUser = encodeUser(userRegistration);
+    User savedUser = userRepository.save(encodedUser);
+    log.info("User with name: '{}' created successfully", savedUser.getUsername());
+    return savedUser;
+  }
+
+  public void verifyUser(String verificationToken){
+    UserVerification userVerification = VerificationUtil.verifyExpirationAndGetUserFromToken(verificationToken);
+    User user = userRepository.findByUuidAndUsername(userVerification.getUuid(), userVerification.getEmail());
+    if (Objects.isNull(user)) {
+      throw new ApiException("There is no appropriate user found.", HttpStatus.NOT_FOUND.value());
+    }
+    user.setEnabled(true);
+    userRepository.save(user);
   }
 
   private User encodeUser(UserRegistration userRegistration) {
     String password = passwordEncoder.encode(userRegistration.getPassword());
     return new User()
+        .setUuid(UUID.randomUUID().toString())
         .setUsername(userRegistration.getEmail())
         .setPassword(password)
         .setFirstName(userRegistration.getFirstName())
         .setLastName(userRegistration.getLastName())
         .setRole(UserRole.ROLE_USER)
-        .setEnabled(true)
+        .setEnabled(false)
         .setAccountNonExpired(true)
         .setCredentialsNonExpired(true)
         .setAccountNonLocked(true);

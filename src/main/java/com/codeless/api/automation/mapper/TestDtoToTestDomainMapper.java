@@ -1,6 +1,5 @@
 package com.codeless.api.automation.mapper;
 
-
 import com.codeless.api.automation.domain.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;

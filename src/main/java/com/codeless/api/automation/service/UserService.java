@@ -1,8 +1,10 @@
 package com.codeless.api.automation.service;
 
 import com.codeless.api.automation.dto.UserRegistration;
+import com.codeless.api.automation.entity.User;
 
 public interface UserService {
 
-  void saveUser(UserRegistration userRegistration);
+  User saveUser(UserRegistration userRegistration);
+  void verifyUser(String verificationToken);
 }
