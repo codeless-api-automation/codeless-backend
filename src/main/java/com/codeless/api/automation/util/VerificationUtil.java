@@ -27,18 +27,6 @@ public final class VerificationUtil {
             .getBytes());
   }
 
-  public static UserVerification verifyExpirationAndGetUserFromToken(String token) {
-    UserVerification userVerification = new UserVerification();
-    try {
-      String[] tokenDetails = new String(Base64.getUrlDecoder().decode(token.getBytes()))
-          .split(JOINER);
-      userVerification.setUuid(tokenDetails[0]).setEmail(tokenDetails[1]).setDate(tokenDetails[2]);
-    } catch (Exception ex) {
-      throw new ApiException("Invalid verification token.", HttpStatus.FORBIDDEN.value());
-    }
-    return userVerification;
-  }
-
   public static UserVerification getUserVerification(String token) {
     UserVerification userVerification = new UserVerification();
     try {
