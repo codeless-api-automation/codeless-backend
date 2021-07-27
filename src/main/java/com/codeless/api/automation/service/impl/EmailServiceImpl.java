@@ -27,9 +27,7 @@ public class EmailServiceImpl implements EmailService {
     javaMailSender.send(mimeMessage);
   }
 
-  public MimeMessage generateVerificationMessage(User user,
-      HttpServletRequest httpServletRequest) {
-
+  public MimeMessage generateVerificationMessage(User user, HttpServletRequest httpServletRequest) {
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
     try {
       MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "utf-8");
