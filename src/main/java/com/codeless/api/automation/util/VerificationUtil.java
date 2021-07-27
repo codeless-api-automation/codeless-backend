@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 public final class VerificationUtil {
 
   private static final String JOINER = ":::";
-  private static final int TOKEN_TTL_MINUTES = 45;
+  private static final int TOKEN_TTL_MINUTES = 15;
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME
       .withZone(
@@ -36,15 +36,25 @@ public final class VerificationUtil {
     } catch (Exception ex) {
       throw new ApiException("Invalid verification token.", HttpStatus.FORBIDDEN.value());
     }
-    verifyTokenExpiration(userVerification.getDate());
     return userVerification;
   }
 
-  private static void verifyTokenExpiration(String tokenIssueTime) {
-    if (
-        LocalDateTime.parse(tokenIssueTime, DATE_TIME_FORMATTER).plusMinutes(TOKEN_TTL_MINUTES)
-            .isBefore(LocalDateTime.now())) {
-      throw new ApiException("Verification token is expired", HttpStatus.FORBIDDEN.value());
+  public static UserVerification getUserVerification(String token) {
+    UserVerification userVerification = new UserVerification();
+    try {
+      String[] tokenDetails = new String(Base64.getUrlDecoder().decode(token.getBytes()))
+          .split(JOINER);
+      userVerification.setUuid(tokenDetails[0]).setEmail(tokenDetails[1]).setDate(tokenDetails[2]);
+    } catch (Exception ex) {
+      throw new ApiException("Invalid verification token.", HttpStatus.FORBIDDEN.value());
     }
+    return userVerification;
+  }
+
+  public static boolean isTokenExpired(String tokenIssueTime) {
+    return
+        LocalDateTime.parse(tokenIssueTime, DATE_TIME_FORMATTER).plusDays(TOKEN_TTL_MINUTES)
+            .isBefore(LocalDateTime.now());
   }
 }
+

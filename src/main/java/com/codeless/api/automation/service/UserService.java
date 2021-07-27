@@ -6,5 +6,6 @@ import com.codeless.api.automation.entity.User;
 public interface UserService {
 
   User saveUser(UserRegistration userRegistration);
-  void verifyUser(String verificationToken);
+
+  User verifyUser(String verificationToken);
 }

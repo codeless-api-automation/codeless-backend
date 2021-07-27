@@ -4,7 +4,6 @@ import com.codeless.api.automation.dto.UserRegistration;
 import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.service.EmailService;
 import com.codeless.api.automation.service.UserService;
-import com.codeless.api.automation.util.EmailMessageUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +26,23 @@ public class UserController {
   private final EmailService emailService;
 
   @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-  public void register(HttpServletRequest httpServletRequest, @Valid @RequestBody UserRegistration userRegistration) {
+  public void register(HttpServletRequest httpServletRequest,
+      @Valid @RequestBody UserRegistration userRegistration) {
     User user = userService.saveUser(userRegistration);
-    emailService.sendEmail(EmailMessageUtil.generateVerificationMessage(user, httpServletRequest));
+    emailService.sendEmail(user, httpServletRequest);
   }
 
   @GetMapping(value = "/verify")
-  public ResponseEntity<String> confirm(@RequestParam("verification-token") String verificationToken) {
-    userService.verifyUser(verificationToken);
+  public ResponseEntity<String> verify(HttpServletRequest httpServletRequest,
+      @RequestParam("verification-token") String verificationToken) {
+    User user = userService.verifyUser(verificationToken);
+    if (!user.isEnabled()) {
+      emailService
+          .sendEmail(user, httpServletRequest);
+      return ResponseEntity
+          .status(HttpStatus.GONE)
+          .body("Verification token is expired, please check your email to verify account");
+    }
     return ResponseEntity
         .status(HttpStatus.OK)
         .body("User verified successfully.");
