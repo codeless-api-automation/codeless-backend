@@ -1,37 +1,43 @@
-package com.codeless.api.automation.util;
+package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.dto.UserVerification;
 import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.exception.ApiException;
-import java.time.Instant;
+import com.codeless.api.automation.service.VerificationService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
-public final class VerificationUtil {
+@Service
+@Log4j2
+@RequiredArgsConstructor
+public class VerificationServiceImpl implements VerificationService {
 
   private static final String JOINER = ":::";
   private static final int TOKEN_TTL_MINUTES = 15;
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-      .withZone(
-          ZoneId.from(ZoneOffset.UTC));
+      .withZone(ZoneId.from(ZoneOffset.UTC));
 
-  public static String createVerificationToken(User user) {
+  @Override
+  public String createVerificationToken(User user) {
     return Base64.getUrlEncoder().encodeToString(
         String.join(JOINER, user.getUuid(), user.getUsername(),
-            DATE_TIME_FORMATTER.format(LocalDateTime.now()))
-            .getBytes());
+            DATE_TIME_FORMATTER.format(LocalDateTime.now())).getBytes());
   }
 
-  public static UserVerification getUserVerification(String token) {
+  @Override
+  public UserVerification getUserVerification(String verificationToken) {
     UserVerification userVerification = new UserVerification();
     try {
-      String[] tokenDetails = new String(Base64.getUrlDecoder().decode(token.getBytes()))
-          .split(JOINER);
+      String[] tokenDetails = new String(
+          Base64.getUrlDecoder().decode(verificationToken.getBytes())).split(JOINER);
       userVerification.setUuid(tokenDetails[0]).setEmail(tokenDetails[1]).setDate(tokenDetails[2]);
     } catch (Exception ex) {
       throw new ApiException("Invalid verification token.", HttpStatus.FORBIDDEN.value());
@@ -39,10 +45,10 @@ public final class VerificationUtil {
     return userVerification;
   }
 
-  public static boolean isTokenExpired(String tokenIssueTime) {
+  @Override
+  public boolean isTokenExpired(String tokenIssueTime) {
     return
         LocalDateTime.parse(tokenIssueTime, DATE_TIME_FORMATTER).plusDays(TOKEN_TTL_MINUTES)
             .isBefore(LocalDateTime.now());
   }
 }
-

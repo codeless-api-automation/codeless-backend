@@ -7,7 +7,7 @@ import com.codeless.api.automation.entity.UserRole;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.UserService;
-import com.codeless.api.automation.util.VerificationUtil;
+import com.codeless.api.automation.service.VerificationService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +26,7 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
   private final UserRepository userRepository;
+  private final VerificationService verificationService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
@@ -41,10 +42,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public User saveUser(UserRegistration userRegistration) {
     User user = userRepository.findByUsername(userRegistration.getEmail());
     if (Objects.nonNull(user) && !user.isEnabled()) {
-      throw new ApiException("Verification already sent, please check your email.", HttpStatus.BAD_REQUEST.value());
+      throw new ApiException("Verification already sent, please check your email.",
+          HttpStatus.BAD_REQUEST.value());
     }
     if (Objects.nonNull(user) && user.isEnabled()) {
-      throw new ApiException("User with this email is already in use. Try another.", HttpStatus.BAD_REQUEST.value());
+      throw new ApiException("User with this email is already in use. Try another.",
+          HttpStatus.BAD_REQUEST.value());
     }
     User encodedUser = encodeUser(userRegistration);
     User savedUser = userRepository.save(encodedUser);
@@ -52,14 +55,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     return savedUser;
   }
 
-  public User verifyUser(String verificationToken){
-    UserVerification userVerification = VerificationUtil.getUserVerification(verificationToken);
-    User user = userRepository.findByUuidAndUsername(userVerification.getUuid(), userVerification.getEmail());
+  public User verifyUser(String verificationToken) {
+    UserVerification userVerification = verificationService.getUserVerification(verificationToken);
+    User user = userRepository
+        .findByUuidAndUsername(userVerification.getUuid(), userVerification.getEmail());
     if (Objects.isNull(user)) {
-      throw new ApiException("There is no appropriate user found, please register", HttpStatus.NOT_FOUND.value());
+      throw new ApiException("There is no appropriate user found, please register",
+          HttpStatus.NOT_FOUND.value());
     }
-    if (VerificationUtil.isTokenExpired(userVerification.getDate())){
-       return user;
+    if (verificationService.isTokenExpired(userVerification.getDate())) {
+      return user;
     }
     user.setEnabled(true);
     return userRepository.save(user);
