@@ -18,8 +18,13 @@ public class InfluxdbConfiguration {
   @Value("${influxdb.password}")
   private String password;
 
+  @Value("${influxdb.database}")
+  private String database;
+
   @Bean
   public InfluxDB influxDatabase() {
-    return InfluxDBFactory.connect(databaseURL, userName, password);
+    InfluxDB influxDB = InfluxDBFactory.connect(databaseURL, userName, password);
+    influxDB.setDatabase(database);
+    return influxDB;
   }
 }
