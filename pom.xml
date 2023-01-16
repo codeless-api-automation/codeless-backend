@@ -24,7 +24,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <mapstruct.version>1.3.0.Beta2</mapstruct.version>
     <lombok.version>1.18.16</lombok.version>
-    <guava.version>29.0-jre</guava.version>
+    <guava.version>31.1-jre</guava.version>
   </properties>
 
   <dependencies>
