@@ -1,6 +1,5 @@
 package com.codeless.api.automation.service.impl;
 
-import com.codeless.api.automation.configuration.DataFlowConfiguration;
 import com.codeless.api.automation.domain.Test;
 import com.codeless.api.automation.dto.Execution;
 import com.codeless.api.automation.dto.ExecutionResult;
@@ -20,18 +19,15 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.dataflow.rest.client.TaskOperations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ExecutionServiceImpl implements ExecutionService {
 
-  private final TaskOperations taskOperations;
-  private final DataFlowConfiguration dataFlowConfiguration;
+  //private final TaskService taskService;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
   private final TestDtoToTestDomainMapper testDtoToTestDomainMapper;
   private final TestSuiteBuilderService testSuiteBuilderService;
@@ -52,14 +48,12 @@ public class ExecutionServiceImpl implements ExecutionService {
     com.codeless.api.automation.entity.Execution persistedExecution =
         executionRepository.save(preparedExecution);
 
-    taskOperations.launch(dataFlowConfiguration.getTaskName(),
-        taskLaunchArgumentsService.getProperties(),
-        ImmutableList.of(
-            taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests)),
-            taskLaunchArgumentsService.getExecutionIdArgument(persistedExecution.getId()),
-            taskLaunchArgumentsService
-                .getExecutionTypeArgument(ExecutionType.MANUAL_EXECUTION.getName())),
-        null);
+//    taskService.launch(
+//        ImmutableList.of(
+//            taskLaunchArgumentsService.getTestSuiteArgument(testSuiteBuilderService.build(tests)),
+//            taskLaunchArgumentsService.getExecutionIdArgument(persistedExecution.getId()),
+//            taskLaunchArgumentsService
+//                .getExecutionTypeArgument(ExecutionType.MANUAL_EXECUTION.getName())));
 
     return Execution.builder()
         .id(persistedExecution.getId())

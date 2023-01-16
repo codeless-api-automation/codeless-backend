@@ -24,9 +24,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <mapstruct.version>1.3.0.Beta2</mapstruct.version>
     <lombok.version>1.18.16</lombok.version>
-    <spring-cloud-dataflow-rest-client.version>2.6.1</spring-cloud-dataflow-rest-client.version>
     <guava.version>29.0-jre</guava.version>
-    <influxdb.version>2.21</influxdb.version>
   </properties>
 
   <dependencies>
@@ -37,11 +35,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-dataflow-rest-client</artifactId>
-      <version>${spring-cloud-dataflow-rest-client.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -103,11 +96,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.influxdb</groupId>
-      <artifactId>influxdb-java</artifactId>
-      <version>${influxdb.version}</version>
     </dependency>
     <dependency>
       <groupId>com.codeless.api.automation</groupId>
