@@ -1,20 +1,41 @@
-version: '3.1'
-
+version: '3.8'
 services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      LAMBDA_DOCKER_NETWORK: local_network
+      POSTGRES_PASSWORD: unbiasedc
+      POSTGRES_USER: unbiasedc
+    ports:
+      - 5432:5432
   redis:
+    container_name: redis
     image: redis:latest
     ports:
       - 6379:6379
-    volumes:
-      - ./config/redis.conf:/redis.conf
-    command: [ "redis-server", "/redis.conf" ]
-  mariadb:
-    image: mariadb:10.2
+  aws:
+    container_name: aws
+    image: localstack/localstack:latest
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-    restart: on-failure
+      LAMBDA_EXECUTOR: local
+      DEBUG: 1
+      # Docker network that lambdas are reachable by.
+      # This makes it easier for Lambads to be invoked by other
+      # external Docker containers.
+      LAMBDA_DOCKER_NETWORK: local_network
+      # Use our local files via Docker volumes to define our Lambdas
+      LAMBDA_REMOTE_DOCKER: 0
+      # Spin up the Lambda module
+      SERVICES: lambda
     ports:
-      - 3306:3306
+      - 4566:4566
     volumes:
-      - ${PWD}/mariadb:/var/lib/mysql
+      # Let LocalStack create new docker containers by giving
+      # LocalStack access to your computer's Docker daemon
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.cache/localstack/volume:/var/lib/localstack
+
+networks:
+  default:
+    name: local_network
