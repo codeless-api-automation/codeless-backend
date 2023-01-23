@@ -1,7 +1,9 @@
 package com.codeless.api.automation.util;
 
 import com.codeless.api.automation.constant.ArgumentConstant;
+import com.google.common.collect.ImmutableMap;
 import java.util.Base64;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,24 +11,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TaskLaunchArgumentsService {
 
-  private static final String ARGUMENT_FORMAT = "%s=%s";
-
-  public String getTestSuiteArgument(String testSuite) {
+  public Map<String, String> getTestSuiteArgument(String testSuite) {
     byte[] encodedTestSuite = Base64.getEncoder().encode(testSuite.getBytes());
-    final String testSuiteTaskArgument = "suite=%s";
-    return String.format(testSuiteTaskArgument, new String(encodedTestSuite));
+    return ImmutableMap.of("suite", new String(encodedTestSuite));
   }
 
-  public String getExecutionTypeArgument(String executionType) {
-    return String.format(ARGUMENT_FORMAT, ArgumentConstant.EXECUTION_TYPE, executionType);
+  public Map<String, String> getExecutionTypeArgument(String executionType) {
+    return ImmutableMap.of(ArgumentConstant.EXECUTION_TYPE, executionType);
   }
 
-  public String getScheduleIdArgument(Long scheduleId) {
-    return String.format(ARGUMENT_FORMAT, ArgumentConstant.SCHEDULE_ID, scheduleId);
+  public Map<String, String> getScheduleIdArgument(Long scheduleId) {
+    return ImmutableMap.of(ArgumentConstant.SCHEDULE_ID, String.valueOf(scheduleId));
   }
 
-  public String getExecutionIdArgument(Long executionId) {
-    return String.format(ARGUMENT_FORMAT, ArgumentConstant.EXECUTION_ID, executionId);
+  public Map<String, String> getExecutionIdArgument(Long executionId) {
+    return ImmutableMap.of(ArgumentConstant.EXECUTION_ID, String.valueOf(executionId));
   }
 
 }

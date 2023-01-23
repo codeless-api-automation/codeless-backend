@@ -1,6 +1,6 @@
 package com.codeless.api.automation.service.impl;
 
-import com.codeless.api.automation.configuration.EmailConfig;
+import com.codeless.api.automation.configuration.EmailConfiguration;
 import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.service.ContentBuilderService;
 import com.codeless.api.automation.service.EmailService;
@@ -27,7 +27,7 @@ public class EmailServiceImpl implements EmailService {
   private final VerificationService verificationService;
   private final ContentBuilderService contentBuilderService;
   private final JavaMailSender javaMailSender;
-  private final EmailConfig emailConfig;
+  private final EmailConfiguration emailConfig;
 
   @Override
   public void sendEmail(User user) {

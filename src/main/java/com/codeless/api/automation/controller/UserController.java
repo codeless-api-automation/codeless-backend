@@ -1,9 +1,11 @@
 package com.codeless.api.automation.controller;
 
+import com.codeless.api.automation.configuration.EmailConfiguration;
 import com.codeless.api.automation.dto.UserRegistration;
 import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.service.EmailService;
 import com.codeless.api.automation.service.UserService;
+import java.net.URI;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ public class UserController {
 
   private final UserService userService;
   private final EmailService emailService;
+  private final EmailConfiguration emailConfiguration;
 
   @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
   public void register(@Valid @RequestBody UserRegistration userRegistration) {
@@ -42,7 +45,8 @@ public class UserController {
           .body("Verification token is expired, please check your email to verify account");
     }
     return ResponseEntity
-        .status(HttpStatus.OK)
+        .status(HttpStatus.PERMANENT_REDIRECT)
+        .location(URI.create(emailConfiguration.getVerificationSuccessRedirect()))
         .body("User verified successfully.");
   }
 }
