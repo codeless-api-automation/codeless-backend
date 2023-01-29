@@ -5,7 +5,6 @@ import com.codeless.api.automation.entity.Region;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.RegionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ public class ScheduleDtoMapper implements
     Mapper<Schedule, com.codeless.api.automation.entity.Schedule> {
 
   private final ObjectMapper objectMapper;
-  private final TestDtoToTestMapper testDtoToTestMapper;
   private final RegionRepository regionRepository;
 
   @Override
@@ -34,9 +32,7 @@ public class ScheduleDtoMapper implements
     scheduleEntity.setTimer(objectMapper.writeValueAsString(source.getTimer()));
     scheduleEntity.setEmails(
         source.getEmails() == null ? null : objectMapper.writeValueAsString(source.getEmails()));
-    scheduleEntity.setTests(source.getTests().stream()
-        .map(testDtoToTestMapper::map)
-        .collect(Collectors.toSet()));
+    scheduleEntity.setTestId(source.getTestId());
     return scheduleEntity;
   }
 }

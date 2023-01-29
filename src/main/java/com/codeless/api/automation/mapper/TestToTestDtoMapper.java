@@ -4,14 +4,14 @@ import com.codeless.api.automation.dto.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class TestMapper implements Mapper<com.codeless.api.automation.entity.Test, Test> {
+public class TestToTestDtoMapper implements Mapper<com.codeless.api.automation.entity.Test, Test> {
 
   private final ObjectMapper objectMapper;
 
@@ -24,9 +24,9 @@ public class TestMapper implements Mapper<com.codeless.api.automation.entity.Tes
         .build();
   }
 
-  private Map<Object, Object> toMap(String json) {
+  private List<Map<Object, Object>> toMap(String json) {
     try {
-      return objectMapper.readValue(json, new TypeReference<HashMap<Object, Object>>() {
+      return objectMapper.readValue(json, new TypeReference<List<Map<Object, Object>>>() {
       });
     } catch (JsonProcessingException e) {
       throw new RuntimeException();

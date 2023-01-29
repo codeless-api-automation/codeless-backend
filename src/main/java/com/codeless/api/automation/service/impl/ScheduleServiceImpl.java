@@ -1,11 +1,9 @@
 package com.codeless.api.automation.service.impl;
 
-import com.codeless.api.automation.domain.Test;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Schedule;
 import com.codeless.api.automation.mapper.ScheduleDtoMapper;
 import com.codeless.api.automation.mapper.ScheduleMapper;
-import com.codeless.api.automation.mapper.TestDtoToTestDomainMapper;
 import com.codeless.api.automation.mapper.TimerDtoToContextMapper;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
@@ -29,7 +27,6 @@ public class ScheduleServiceImpl implements ScheduleService {
   //private final SchedulerService schedulerService;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
   private final TestSuiteBuilderService testSuiteBuilderService;
-  private final TestDtoToTestDomainMapper testDtoToTestDomainMapper;
   private final ScheduleDtoMapper scheduleDtoMapper;
   private final ScheduleMapper scheduleMapper;
   private final TimerDtoToContextMapper timerDtoToContextMapper;
@@ -38,10 +35,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
   @Override
   public Schedule runSchedule(Schedule schedule) {
-    List<Test> tests = schedule.getTests().stream()
-        .map(testDtoToTestDomainMapper::map)
-        .collect(Collectors.toList());
-
     final String internalScheduleName =
         UUID.nameUUIDFromBytes(schedule.getScheduleName().getBytes(StandardCharsets.UTF_8))
             .toString();

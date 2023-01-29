@@ -1,6 +1,7 @@
 package com.codeless.api.automation.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,5 +15,5 @@ public class Test {
 
   Long id;
   @NotBlank String name;
-  @NotNull Map<Object, Object> json;
+  @NotNull List<Map<Object, Object>> json;
 }

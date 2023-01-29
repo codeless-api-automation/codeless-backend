@@ -3,6 +3,7 @@ package com.codeless.api.automation.mapper;
 import com.codeless.api.automation.dto.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automa
     return test;
   }
 
-  private String toString(Map<Object, Object> json) {
+  private String toString(List<Map<Object, Object>> json) {
     try {
       return objectMapper.writeValueAsString(json);
     } catch (JsonProcessingException e) {

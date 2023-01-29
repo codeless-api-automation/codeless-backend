@@ -7,16 +7,15 @@ import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.service.TestService;
 import java.net.URI;
-import java.util.List;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,9 +52,9 @@ public class TestController {
     return testService.getAllTests(page, size);
   }
 
-  @PatchMapping
-  public void deleteTests(@RequestBody @Valid @NotEmpty List<Test> tests) {
-    testService.deleteTests(tests);
+  @DeleteMapping(path = "/{testId}")
+  public void deleteTest(@PathVariable Long testId) {
+    testService.deleteTest(testId);
   }
 
 }

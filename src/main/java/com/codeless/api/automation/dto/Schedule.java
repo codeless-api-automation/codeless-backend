@@ -13,7 +13,7 @@ import lombok.Value;
 public class Schedule {
 
   @NotEmpty String scheduleName;
-  @NotEmpty List<Test> tests;
+  @NotNull Long testId;
   @NotNull Region region;
   @NotNull Timer timer;
   List<String> emails;

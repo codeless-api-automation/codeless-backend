@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ public class ScheduleMapper implements Mapper<Schedule, com.codeless.api.automat
 
   private final ObjectMapper objectMapper;
   private final RegionMapper regionMapper;
-  private final TestMapper testMapper;
 
   @Override
   @SneakyThrows
@@ -30,9 +28,7 @@ public class ScheduleMapper implements Mapper<Schedule, com.codeless.api.automat
             : objectMapper.readValue(source.getEmails(), new TypeReference<List<String>>() {
             }))
         .timer(objectMapper.readValue(source.getTimer(), Timer.class))
-        .tests(source.getTests().stream()
-            .map(testMapper::map)
-            .collect(Collectors.toList()))
+        .testId(source.getTestId())
         .build();
   }
 }

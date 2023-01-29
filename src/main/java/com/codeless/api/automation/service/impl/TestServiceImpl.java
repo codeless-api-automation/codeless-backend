@@ -4,15 +4,19 @@ import static java.util.stream.Collectors.toList;
 
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Test;
+import com.codeless.api.automation.entity.Execution;
+import com.codeless.api.automation.entity.ExecutionStatus;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.mapper.Mapper;
+import com.codeless.api.automation.repository.ExecutionRepository;
+import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -25,6 +29,8 @@ public class TestServiceImpl implements TestService {
   private final Mapper<Test, com.codeless.api.automation.entity.Test> testDtoToTestMapper;
   private final Mapper<com.codeless.api.automation.entity.Test, Test> testToTestDtoMapper;
   private final TestRepository testRepository;
+  private final ScheduleRepository scheduleRepository;
+  private final ExecutionRepository executionRepository;
   private final ObjectMapper objectMapper;
 
   @Override
@@ -70,13 +76,25 @@ public class TestServiceImpl implements TestService {
   }
 
   @Override
-  public void deleteTests(List<Test> tests) {
-    testRepository.deleteAll(tests.stream()
-        .map(testDtoToTestMapper::map)
-        .collect(Collectors.toList()));
+  public void deleteTest(Long id) {
+    List<com.codeless.api.automation.entity.Schedule> schedules =
+        scheduleRepository.findAllByTestId(id);
+    if (!schedules.isEmpty()) {
+      throw new ApiException("There are schedules associated with this test. "
+          + "Please delete schedules first before deleting the test.", HttpStatus.BAD_REQUEST.value());
+    }
+
+    List<Execution> executions = executionRepository.findAllByTestIdAndStatusIn(id,
+        Arrays.asList(ExecutionStatus.STARTED, ExecutionStatus.PENDING));
+    if (!executions.isEmpty()) {
+      throw new ApiException("Executions are in progress. "
+          + "Please try to delete this test later.", HttpStatus.BAD_REQUEST.value());
+    }
+
+    testRepository.deleteById(id);
   }
 
-  private String toString(Map<Object, Object> json) {
+  private String toString(List<Map<Object, Object>> json) {
     try {
       return objectMapper.writeValueAsString(json);
     } catch (JsonProcessingException e) {
