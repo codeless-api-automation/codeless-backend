@@ -2,31 +2,31 @@ package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Schedule;
+import com.codeless.api.automation.entity.ExecutionType;
 import com.codeless.api.automation.mapper.ScheduleDtoMapper;
 import com.codeless.api.automation.mapper.ScheduleMapper;
 import com.codeless.api.automation.mapper.TimerDtoToContextMapper;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.ScheduleService;
-import com.codeless.api.automation.service.TestSuiteBuilderService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
-  private static final String CRON_EXPRESSION = "scheduler.cron.expression";
-
-  //private final SchedulerService schedulerService;
+  private final SchedulerClientImpl schedulerClient;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
-  private final TestSuiteBuilderService testSuiteBuilderService;
   private final ScheduleDtoMapper scheduleDtoMapper;
   private final ScheduleMapper scheduleMapper;
   private final TimerDtoToContextMapper timerDtoToContextMapper;
@@ -34,6 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final CronExpressionBuilderService cronExpressionBuilderService;
 
   @Override
+  @Transactional
   public Schedule runSchedule(Schedule schedule) {
     final String internalScheduleName =
         UUID.nameUUIDFromBytes(schedule.getScheduleName().getBytes(StandardCharsets.UTF_8))
@@ -46,19 +47,18 @@ public class ScheduleServiceImpl implements ScheduleService {
     com.codeless.api.automation.entity.Schedule persistedSchedule =
         scheduleRepository.save(preparedSchedule);
 
-//    schedulerService.schedule(internalScheduleName,
-//        ImmutableMap.<String, String>builder()
-//            .put(CRON_EXPRESSION, cronExpressionBuilderService
-//                .buildCronExpression(timerDtoToContextMapper.map(schedule.getTimer())))
-//            .build(),
-//        ImmutableList.<String>builder()
-//            .add(taskLaunchArgumentsService
-//                .getTestSuiteArgument(testSuiteBuilderService.build(tests)))
-//            .add(taskLaunchArgumentsService
-//                .getScheduleIdArgument(persistedSchedule.getId()))
-//            .add(taskLaunchArgumentsService
-//                .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()))
-//            .build());
+    Map<String, String> payload = new HashMap<>();
+    payload.putAll(taskLaunchArgumentsService
+        .getScheduleIdArgument(persistedSchedule.getId()));
+    payload.putAll(taskLaunchArgumentsService
+        .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()));
+
+    schedulerClient.createSchedule(
+        persistedSchedule.getRegion().getAwsCloudRegion(),
+        internalScheduleName,
+        String.format("cron(%s)",
+        cronExpressionBuilderService.buildCronExpression(timerDtoToContextMapper.map(schedule.getTimer()))),
+        payload);
 
     return scheduleMapper.map(persistedSchedule);
   }

@@ -11,6 +11,8 @@ public class AwsConfiguration {
 
   @Value("${codeless.aws.function-name}")
   private String functionName;
+  @Value("${codeless.aws.schedule-role-name}")
+  private String scheduleRoleName;
   @Value("#{${codeless.aws.credentials-by-region}}")
   private Map<String, Map<String, String>> credentialsByRegion;
 }

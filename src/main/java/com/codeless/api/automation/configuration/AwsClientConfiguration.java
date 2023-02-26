@@ -12,6 +12,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.lambda.LambdaClient;
+import software.amazon.awssdk.services.scheduler.SchedulerClient;
 
 @Configuration
 public class AwsClientConfiguration {
@@ -39,6 +40,25 @@ public class AwsClientConfiguration {
       lambdaClientByRegion.put(region, lambdaClient);
     }
     return lambdaClientByRegion;
+  }
+
+  @Bean
+  public Map<Region, SchedulerClient> schedulerClientByRegion(AwsConfiguration awsConfiguration) {
+    Map<Region, SchedulerClient> schedulerClientByRegion = new HashMap<>();
+    for (Region region : SUPPORTED_REGIONS) {
+      Map<String, String> regionCredentials = awsConfiguration.getCredentialsByRegion()
+          .get(region.toString());
+      AwsCredentials credentials = AwsBasicCredentials.create(
+          regionCredentials.get(ACCESS_KEY),
+          regionCredentials.get(SECRET_KEY));
+      SchedulerClient schedulerClient = SchedulerClient.builder()
+          .region(region)
+          .credentialsProvider(StaticCredentialsProvider.create(credentials))
+          .applyMutation(builder -> builder.endpointOverride(URI.create(LOCAL_ENDPOINT_URL)))
+          .build();
+      schedulerClientByRegion.put(region, schedulerClient);
+    }
+    return schedulerClientByRegion;
   }
 
 }
