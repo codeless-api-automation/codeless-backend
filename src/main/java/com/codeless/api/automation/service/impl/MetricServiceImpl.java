@@ -3,27 +3,29 @@ package com.codeless.api.automation.service.impl;
 import com.codeless.api.automation.dto.MetricContext;
 import com.codeless.api.automation.dto.Metrics;
 import com.codeless.api.automation.dto.ResponsePoint;
+import com.codeless.api.automation.repository.TimeSeriesRepository;
 import com.codeless.api.automation.service.MetricService;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Log4j2
 public class MetricServiceImpl implements MetricService {
+
+  private final TimeSeriesRepository timeSeriesRepository;
 
   @Override
   public Metrics getMetrics(MetricContext metricContext) {
-    String queryFormat = String.format(""
-            + "SELECT * FROM response_time WHERE schedule_name = '%s' AND time > '%s' AND time < '%s'",
-        metricContext.getScheduleName(),
-        metricContext.getStartDate().toInstant().toString(),
-        metricContext.getEndDate().toInstant().toString());
+    Object time = timeSeriesRepository.getRange(metricContext.getScheduleName(),
+        metricContext.getStartDate().toInstant().getEpochSecond(),
+        metricContext.getEndDate().toInstant().getEpochSecond());
 
-    log.info("Metric query={}", queryFormat);
+    log.info("Time series metrics {}", time);
+
     List<ResponsePoint> memoryPoints = new ArrayList<>();
     return new Metrics(memoryPoints);
   }

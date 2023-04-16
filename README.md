@@ -5,3 +5,7 @@
 ```
 docker-compose up -d
 ```
+3. Get lambda logs
+```
+aws --endpoint-url=http://localhost:4566 logs tail /aws/lambda/codeless-test-execution --follow
+```
