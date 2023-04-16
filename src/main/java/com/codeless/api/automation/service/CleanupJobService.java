@@ -1,5 +1,6 @@
 package com.codeless.api.automation.service;
 
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class CleanupJobService {
 
   @Value("${codeless.job.delete-expired-executions.interval-in-cron.expiration-time}")
-  private String expirationTime;
+  private Duration expirationTime;
 
   @Scheduled(cron = "${codeless.job.delete-expired-executions.interval-in-cron}")
   @SchedulerLock(name = "delete-expired-executions")

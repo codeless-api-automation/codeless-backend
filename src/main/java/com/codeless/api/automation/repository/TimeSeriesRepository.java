@@ -1,43 +1,43 @@
 package com.codeless.api.automation.repository;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.timeseries.TimeSeriesProtocol.TimeSeriesCommand;
+import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.timeseries.TSCreateParams;
+import redis.clients.jedis.timeseries.TSElement;
 
 @Component
-@RequiredArgsConstructor
 public class TimeSeriesRepository {
 
-  private final JedisPool jedisPool;
+  @Value("${codeless.ts.retention}")
+  private Duration retention;
+
+  @Autowired
+  private JedisPooled jedisPool;
 
   public void create(String key) {
-    this.create(key, 0);
+    this.create(key, retention.toMillis());
   }
 
-  public void create(String key, Integer retentionPeriodInMills) {
-    try (Jedis jedis = jedisPool.getResource()) {
-      jedis.sendCommand(TimeSeriesCommand.CREATE, key, "RETENTION",
-          String.valueOf(retentionPeriodInMills));
-    }
+  public void create(String key, Long retentionPeriodInMills) {
+    TSCreateParams tsCreateParams = new TSCreateParams();
+    tsCreateParams.retention(retentionPeriodInMills);
+    jedisPool.tsCreate(key, tsCreateParams);
   }
 
   public void add(String key, Long timestamp, Double value, Map<String, String> labels) {
-    try (Jedis jedis = jedisPool.getResource()) {
-      jedis.sendCommand(TimeSeriesCommand.ADD, key,
-          String.valueOf(timestamp),
-          String.valueOf(value));
-    }
+    TSCreateParams tsCreateParams = new TSCreateParams();
+    tsCreateParams.labels(labels);
+    tsCreateParams.retention(retention.toMillis());
+    jedisPool.tsAdd(key, timestamp, value);
   }
 
-  public Object getRange(String key, Long start, Long end) {
-    try (Jedis jedis = jedisPool.getResource()) {
-      return jedis.sendCommand(TimeSeriesCommand.RANGE, key,
-          String.valueOf(start),
-          String.valueOf(end));
-    }
+  public List<TSElement> getRange(String key, Long fromTimestamp, Long toTimestamp) {
+    return jedisPool.tsRange(key, fromTimestamp, toTimestamp);
   }
 
 }

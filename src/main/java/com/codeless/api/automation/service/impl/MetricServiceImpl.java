@@ -2,14 +2,15 @@ package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.dto.MetricContext;
 import com.codeless.api.automation.dto.Metrics;
-import com.codeless.api.automation.dto.ResponsePoint;
+import com.codeless.api.automation.dto.TimeSeriesElement;
 import com.codeless.api.automation.repository.TimeSeriesRepository;
 import com.codeless.api.automation.service.MetricService;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.timeseries.TSElement;
 
 @Slf4j
 @Service
@@ -20,13 +21,14 @@ public class MetricServiceImpl implements MetricService {
 
   @Override
   public Metrics getMetrics(MetricContext metricContext) {
-    Object time = timeSeriesRepository.getRange(metricContext.getScheduleName(),
-        metricContext.getStartDate().toInstant().getEpochSecond(),
-        metricContext.getEndDate().toInstant().getEpochSecond());
+    List<TSElement> tsElements = timeSeriesRepository.getRange(metricContext.getScheduleName(),
+        metricContext.getStartDate().toInstant().getEpochSecond() * 1000,
+        metricContext.getEndDate().toInstant().getEpochSecond() * 1000);
 
-    log.info("Time series metrics {}", time);
+    List<TimeSeriesElement> timeSeriesElements = tsElements.stream()
+        .map(tsElement -> new TimeSeriesElement(tsElement.getTimestamp(), tsElement.getValue()))
+        .collect(Collectors.toList());
 
-    List<ResponsePoint> memoryPoints = new ArrayList<>();
-    return new Metrics(memoryPoints);
+    return new Metrics(timeSeriesElements);
   }
 }

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Metrics {
 
-  private List<ResponsePoint> responsePoints;
+  private List<TimeSeriesElement> timeSeriesElements;
 
 }
