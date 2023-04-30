@@ -27,12 +27,12 @@ public class MetricsController {
 
   @GetMapping
   public Metrics getMetrics(
-      @RequestParam(name = "schedule_name") String scheduleName,
+      @RequestParam(name = "schedule_id") Long scheduleId,
       @RequestParam(name = "start_date", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date startDate,
       @RequestParam(name = "end_date", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date endDate) {
 
     MetricContext metricContext = new MetricContext();
-    metricContext.setScheduleName(scheduleName);
+    metricContext.setScheduleId(scheduleId);
     metricContext.setStartDate(startDate == null ? new Date() : startDate);
     metricContext.setEndDate(endDate == null ? new Date() : endDate);
 

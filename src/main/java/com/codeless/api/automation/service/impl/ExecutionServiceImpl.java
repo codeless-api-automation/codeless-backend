@@ -6,11 +6,13 @@ import com.codeless.api.automation.dto.ExecutionResult;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.entity.ExecutionStatus;
 import com.codeless.api.automation.entity.ExecutionType;
+import com.codeless.api.automation.entity.Schedule;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.mapper.ExecutionDtoMapper;
 import com.codeless.api.automation.mapper.ExecutionMapper;
 import com.codeless.api.automation.mapper.ExecutionResultMapper;
 import com.codeless.api.automation.repository.ExecutionRepository;
+import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.ExecutionClient;
 import com.codeless.api.automation.service.ExecutionService;
@@ -40,6 +42,7 @@ public class ExecutionServiceImpl implements ExecutionService {
   private final ExecutionMapper executionMapper;
   private final ExecutionResultMapper executionResultMapper;
   private final TestRepository testRepository;
+  private final ScheduleRepository scheduleRepository;
   private final ObjectMapper objectMapper;
 
   @Override
@@ -55,6 +58,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     com.codeless.api.automation.entity.Execution persistedExecution =
         executionRepository.save(preparedExecution);
 
+
     Map<String, String> payload = new HashMap<>();
     payload.putAll(taskLaunchArgumentsService
         .getTestSuiteArgument(testSuiteBuilderService.build(toTests(test.getJson()))));
@@ -62,6 +66,8 @@ public class ExecutionServiceImpl implements ExecutionService {
         .getExecutionIdArgument(persistedExecution.getId()));
     payload.putAll(taskLaunchArgumentsService
         .getExecutionTypeArgument(ExecutionType.MANUAL_EXECUTION.getName()));
+
+    testingScheduleLocally(execution, persistedExecution, payload);
 
     executionClient.execute(persistedExecution.getRegion().getAwsCloudRegion(), payload);
 
@@ -100,6 +106,22 @@ public class ExecutionServiceImpl implements ExecutionService {
       return objectMapper.readValue(json, new TypeReference<List<Test>>(){});
     } catch (Exception exception) {
       throw new RuntimeException();
+    }
+  }
+
+  private void testingScheduleLocally(
+      Execution execution,
+      com.codeless.api.automation.entity.Execution persistedExecution,
+      Map<String, String> payload) {
+    // TODO: remove it before PROD
+    // scheduler does not work locally so emulating manual execution as if it is scheduled
+    if (execution.getName().contains("schedule")) {
+      payload.putAll(taskLaunchArgumentsService
+          .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()));
+      List<Schedule> schedules =
+          scheduleRepository.findAllByTestId(persistedExecution.getTestId());
+      payload.putAll(taskLaunchArgumentsService
+          .getScheduleIdArgument(schedules.get(0).getId()));
     }
   }
 

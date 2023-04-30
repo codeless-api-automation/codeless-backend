@@ -10,7 +10,6 @@ import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.ScheduleService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +35,11 @@ public class ScheduleServiceImpl implements ScheduleService {
   @Override
   @Transactional
   public Schedule runSchedule(Schedule schedule) {
-    final String internalScheduleName =
-        UUID.nameUUIDFromBytes(schedule.getScheduleName().getBytes(StandardCharsets.UTF_8))
-            .toString();
+    final String scheduleUuid = UUID.randomUUID().toString();
 
     com.codeless.api.automation.entity.Schedule preparedSchedule =
         scheduleDtoMapper.map(schedule);
-    preparedSchedule.setInternalName(internalScheduleName);
+    preparedSchedule.setUuid(scheduleUuid);
 
     com.codeless.api.automation.entity.Schedule persistedSchedule =
         scheduleRepository.save(preparedSchedule);
@@ -55,7 +52,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     schedulerClient.createSchedule(
         persistedSchedule.getRegion().getAwsCloudRegion(),
-        internalScheduleName,
+        scheduleUuid,
         String.format("cron(%s)",
         cronExpressionBuilderService.buildCronExpression(timerDtoToContextMapper.map(schedule.getTimer()))),
         payload);

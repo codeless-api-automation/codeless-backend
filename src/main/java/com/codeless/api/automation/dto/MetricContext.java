@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class MetricContext {
 
-  private String scheduleName;
+  private Long scheduleId;
   private Date startDate;
   private Date endDate;
 }

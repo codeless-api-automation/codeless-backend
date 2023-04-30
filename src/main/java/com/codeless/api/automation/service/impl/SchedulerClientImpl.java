@@ -47,11 +47,11 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
         .scheduleExpression(scheduleExpression)
         .target(sqsTarget)
         .flexibleTimeWindow(FlexibleTimeWindow.builder()
-            .mode(FlexibleTimeWindowMode.OFF)
+            .mode(FlexibleTimeWindowMode.FLEXIBLE)
             .build())
         .build();
 
-    schedulerClient.createSchedule(createScheduleRequest);
+    //schedulerClient.createSchedule(createScheduleRequest);
   }
 
   private String toString(Map<String, String> payload) {
