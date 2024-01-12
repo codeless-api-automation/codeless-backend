@@ -17,44 +17,38 @@ import software.amazon.awssdk.services.scheduler.SchedulerClient;
 @Configuration
 public class AwsClientConfiguration {
 
-  private static final String LOCAL_ENDPOINT_URL = "http://localhost:4566";
   private static final Set<Region> SUPPORTED_REGIONS = ImmutableSet.of(Region.US_EAST_1);
 
-  private static final String ACCESS_KEY = "accessKey";
-  private static final String SECRET_KEY = "secretKey";
-
   @Bean
-  public Map<Region, LambdaClient> lambdaClientByRegion(AwsConfiguration awsConfiguration) {
+  public Map<Region, LambdaClient> lambdaClientByRegion() {
     Map<Region, LambdaClient> lambdaClientByRegion = new HashMap<>();
     for (Region region : SUPPORTED_REGIONS) {
-      Map<String, String> regionCredentials = awsConfiguration.getCredentialsByRegion()
-          .get(region.toString());
-      AwsCredentials credentials = AwsBasicCredentials.create(
-          regionCredentials.get(ACCESS_KEY),
-          regionCredentials.get(SECRET_KEY));
-      LambdaClient lambdaClient = LambdaClient.builder()
-          .region(region)
-          .credentialsProvider(StaticCredentialsProvider.create(credentials))
-          .applyMutation(builder -> builder.endpointOverride(URI.create(LOCAL_ENDPOINT_URL)))
-          .build();
-      lambdaClientByRegion.put(region, lambdaClient);
+      lambdaClientByRegion.put(region, getLambdaClientForProd(region));
     }
     return lambdaClientByRegion;
   }
 
+  public LambdaClient getLambdaClientForProd(Region region) {
+    return LambdaClient.builder()
+        .region(region)
+        .build();
+  }
+
+  public LambdaClient getLambdaClientForLocalStack(Region region) {
+    AwsCredentials credentials = AwsBasicCredentials.create("1", "2");
+    return LambdaClient.builder()
+        .region(region)
+        .credentialsProvider(StaticCredentialsProvider.create(credentials))
+        .applyMutation(builder -> builder.endpointOverride(URI.create("http://localhost:4566")))
+        .build();
+  }
+
   @Bean
-  public Map<Region, SchedulerClient> schedulerClientByRegion(AwsConfiguration awsConfiguration) {
+  public Map<Region, SchedulerClient> schedulerClientByRegion() {
     Map<Region, SchedulerClient> schedulerClientByRegion = new HashMap<>();
     for (Region region : SUPPORTED_REGIONS) {
-      Map<String, String> regionCredentials = awsConfiguration.getCredentialsByRegion()
-          .get(region.toString());
-      AwsCredentials credentials = AwsBasicCredentials.create(
-          regionCredentials.get(ACCESS_KEY),
-          regionCredentials.get(SECRET_KEY));
       SchedulerClient schedulerClient = SchedulerClient.builder()
           .region(region)
-          .credentialsProvider(StaticCredentialsProvider.create(credentials))
-          .applyMutation(builder -> builder.endpointOverride(URI.create(LOCAL_ENDPOINT_URL)))
           .build();
       schedulerClientByRegion.put(region, schedulerClient);
     }

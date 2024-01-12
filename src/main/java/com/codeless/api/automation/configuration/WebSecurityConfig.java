@@ -2,7 +2,6 @@ package com.codeless.api.automation.configuration;
 
 import static java.util.Collections.singletonList;
 
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -79,6 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.cors().disable().csrf().disable().authorizeRequests()
         .antMatchers("/tests/**", "/executions/**", "/schedules/**", "/regions/**").authenticated()
         .antMatchers(HttpMethod.POST, "/users").permitAll()
+        .antMatchers(HttpMethod.GET, "/health").permitAll()
         .and().httpBasic();
   }
 }

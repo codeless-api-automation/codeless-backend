@@ -1,6 +1,5 @@
 package com.codeless.api.automation.configuration;
 
-import java.util.Map;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +12,4 @@ public class AwsConfiguration {
   private String functionName;
   @Value("${codeless.aws.schedule-role-name}")
   private String scheduleRoleName;
-  @Value("#{${codeless.aws.credentials-by-region}}")
-  private Map<String, Map<String, String>> credentialsByRegion;
 }

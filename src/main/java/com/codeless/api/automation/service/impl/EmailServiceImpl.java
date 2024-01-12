@@ -49,7 +49,7 @@ public class EmailServiceImpl implements EmailService {
           ? StringUtils.substring(emailConfig.getHost(), 0, emailConfig.getHost().length() - 1)
           : emailConfig.getHost();
       String verificationUrl =
-          verifiedHost + "/codeless/verify?verification-token=" + verificationToken;
+          verifiedHost + "/api/verify?verification-token=" + verificationToken;
       String messageContent = contentBuilderService.buildContent(emailConfig.getTemplate(),
           Objects.requireNonNull(getMailContext(verificationUrl)));
 

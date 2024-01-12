@@ -2,7 +2,7 @@ package com.codeless.api.automation.util;
 
 public final class RestApiConstant {
 
-  public static final String ROOT_PATH = "/codeless";
+  public static final String ROOT_PATH = "/api";
 
   public static final String TEST_RESOURCE = "/tests";
   public static final String SINGLE_TEST_RESOURCE =  TEST_RESOURCE + "/";
@@ -14,6 +14,7 @@ public final class RestApiConstant {
   public static final String RESULT_RESOURCE = "/results";
   public static final String METRICS_RESOURCE = "/metrics";
   public static final String AUTH_RESOURCE = "/auth";
+  public static final String HEALTH_RESOURCE = "/health";
 
   private RestApiConstant() {
   }
