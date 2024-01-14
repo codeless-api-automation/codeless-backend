@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:16-alpine
     environment:
       LAMBDA_DOCKER_NETWORK: local_network
       POSTGRES_PASSWORD: unbiasedc

@@ -17,18 +17,21 @@ import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.ExecutionClient;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.TestSuiteBuilderService;
+import com.codeless.api.automation.service.UsernameStorageService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class ExecutionServiceImpl implements ExecutionService {
   private final ExecutionClient executionClient;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
   private final TestSuiteBuilderService testSuiteBuilderService;
+  private final UsernameStorageService userStorageService;
   private final ExecutionRepository executionRepository;
   private final ExecutionDtoMapper executionDtoMapper;
   private final ExecutionMapper executionMapper;
@@ -119,10 +123,15 @@ public class ExecutionServiceImpl implements ExecutionService {
       payload.putAll(taskLaunchArgumentsService
           .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()));
       List<Schedule> schedules =
-          scheduleRepository.findAllByTestId(persistedExecution.getTestId());
+          scheduleRepository.findAllByTestIdAndUsername(persistedExecution.getTestId(), getUserName());
       payload.putAll(taskLaunchArgumentsService
           .getScheduleIdArgument(schedules.get(0).getId()));
     }
+  }
+
+  private String getUserName() {
+    return userStorageService.getUsername(
+        Objects.requireNonNull(RequestContextHolder.getRequestAttributes()).getSessionId());
   }
 
 }

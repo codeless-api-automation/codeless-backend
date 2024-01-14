@@ -1,17 +1,21 @@
 package com.codeless.api.automation.mapper;
 
+import com.codeless.api.automation.service.UsernameStorageService;
 import com.codeless.api.automation.dto.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 
 @Service
 @RequiredArgsConstructor
 public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automation.entity.Test> {
 
+  private final UsernameStorageService usernameStorageService;
   private final ObjectMapper objectMapper;
 
   @Override
@@ -19,6 +23,7 @@ public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automa
     com.codeless.api.automation.entity.Test test = new com.codeless.api.automation.entity.Test();
     test.setId(source.getId());
     test.setName(source.getName());
+    test.setUsername(getUserName());
     test.setJson(toString(source.getJson()));
     return test;
   }
@@ -29,5 +34,9 @@ public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automa
     } catch (JsonProcessingException e) {
       throw new RuntimeException();
     }
+  }
+
+  private String getUserName() {
+    return usernameStorageService.getUsername(Objects.requireNonNull(RequestContextHolder.getRequestAttributes()).getSessionId());
   }
 }
