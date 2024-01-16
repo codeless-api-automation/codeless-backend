@@ -2,13 +2,9 @@ package com.codeless.api.automation.controller;
 
 import static com.codeless.api.automation.util.RestApiConstant.AUTH_RESOURCE;
 
-import com.codeless.api.automation.constant.PropertyKey;
-import com.codeless.api.automation.exception.ApiException;
-import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,15 +30,4 @@ public class AuthController {
       session.invalidate();
     }
   }
-
-  private void verifySignIn(HttpServletRequest httpServletRequest) {
-    if (Objects.isNull(httpServletRequest.getParameter(PropertyKey.EMAIL))) {
-      throw new ApiException("Email should be present in request.", HttpStatus.BAD_REQUEST.value());
-    }
-    if (Objects.isNull(httpServletRequest.getParameter(PropertyKey.PASSWORD))) {
-      throw new ApiException("Password should be present in request.",
-          HttpStatus.BAD_REQUEST.value());
-    }
-  }
-
 }
