@@ -2,7 +2,6 @@ package com.codeless.api.automation.service.impl;
 
 import static java.util.stream.Collectors.toList;
 
-import com.codeless.api.automation.service.UsernameStorageService;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.entity.Execution;
@@ -22,8 +21,8 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,6 @@ public class TestServiceImpl implements TestService {
   private final TestRepository testRepository;
   private final ScheduleRepository scheduleRepository;
   private final ExecutionRepository executionRepository;
-  private final UsernameStorageService userStorageService;
   private final ObjectMapper objectMapper;
 
   @Override
@@ -110,7 +108,6 @@ public class TestServiceImpl implements TestService {
   }
 
   private String getUserName() {
-    return userStorageService.getUsername(
-        Objects.requireNonNull(RequestContextHolder.getRequestAttributes()).getSessionId());
+    return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getName());
   }
 }

@@ -17,7 +17,6 @@ import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.ExecutionClient;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.TestSuiteBuilderService;
-import com.codeless.api.automation.service.UsernameStorageService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -40,7 +40,6 @@ public class ExecutionServiceImpl implements ExecutionService {
   private final ExecutionClient executionClient;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
   private final TestSuiteBuilderService testSuiteBuilderService;
-  private final UsernameStorageService userStorageService;
   private final ExecutionRepository executionRepository;
   private final ExecutionDtoMapper executionDtoMapper;
   private final ExecutionMapper executionMapper;
@@ -130,8 +129,6 @@ public class ExecutionServiceImpl implements ExecutionService {
   }
 
   private String getUserName() {
-    return userStorageService.getUsername(
-        Objects.requireNonNull(RequestContextHolder.getRequestAttributes()).getSessionId());
+    return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getName());
   }
-
 }

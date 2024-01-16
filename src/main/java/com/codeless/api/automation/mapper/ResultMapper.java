@@ -1,7 +1,6 @@
 package com.codeless.api.automation.mapper;
 
 import com.codeless.api.automation.entity.Result;
-import com.codeless.api.automation.service.UsernameStorageService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 @RequiredArgsConstructor
 public class ResultMapper implements Mapper<Result, com.codeless.api.automation.dto.Result> {
 
-  private final UsernameStorageService userStorageService;
   private final ObjectMapper objectMapper;
 
   @Override
@@ -26,10 +24,5 @@ public class ResultMapper implements Mapper<Result, com.codeless.api.automation.
         }))
         .testStatus(source.getStatus())
         .build();
-  }
-
-  private String getUserName() {
-    return userStorageService.getUsername(
-        Objects.requireNonNull(RequestContextHolder.getRequestAttributes()).getSessionId());
   }
 }

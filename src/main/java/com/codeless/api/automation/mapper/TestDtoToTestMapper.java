@@ -1,6 +1,5 @@
 package com.codeless.api.automation.mapper;
 
-import com.codeless.api.automation.service.UsernameStorageService;
 import com.codeless.api.automation.dto.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -15,7 +15,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 @RequiredArgsConstructor
 public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automation.entity.Test> {
 
-  private final UsernameStorageService usernameStorageService;
   private final ObjectMapper objectMapper;
 
   @Override
@@ -37,6 +36,6 @@ public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automa
   }
 
   private String getUserName() {
-    return usernameStorageService.getUsername(Objects.requireNonNull(RequestContextHolder.getRequestAttributes()).getSessionId());
+    return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getName());
   }
 }

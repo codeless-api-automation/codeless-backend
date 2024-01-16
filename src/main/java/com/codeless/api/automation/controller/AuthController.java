@@ -4,7 +4,6 @@ import static com.codeless.api.automation.util.RestApiConstant.AUTH_RESOURCE;
 
 import com.codeless.api.automation.constant.PropertyKey;
 import com.codeless.api.automation.exception.ApiException;
-import com.codeless.api.automation.service.UsernameStorageService;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -23,13 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final UsernameStorageService userStorageService;
-
   @PostMapping(value = "/sign-in")
-  public void signIn(HttpServletRequest httpServletRequest) {
-    verifySignIn(httpServletRequest);
-    userStorageService.addUsername(httpServletRequest.getSession().getId(),
-        httpServletRequest.getParameter(PropertyKey.EMAIL));
+  public void signIn() {
   }
 
   @DeleteMapping(value = "/sign-out")
@@ -37,7 +31,6 @@ public class AuthController {
     HttpSession session = request.getSession(false);
     SecurityContextHolder.clearContext();
     if (session != null) {
-      userStorageService.removeUsername(session.getId());
       session.invalidate();
     }
   }
