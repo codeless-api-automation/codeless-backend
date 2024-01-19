@@ -9,3 +9,8 @@ docker-compose up -d
 ```
 aws --endpoint-url=http://localhost:4566 logs tail /aws/lambda/codeless-test-execution --follow
 ```
+
+4. Activate local profile
+```
+spring.profiles.active=local
+```

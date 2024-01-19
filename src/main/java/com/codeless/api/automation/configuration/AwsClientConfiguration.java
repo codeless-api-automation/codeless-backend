@@ -5,8 +5,10 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -19,22 +21,34 @@ public class AwsClientConfiguration {
 
   private static final Set<Region> SUPPORTED_REGIONS = ImmutableSet.of(Region.US_EAST_1);
 
-  @Bean
-  public Map<Region, LambdaClient> lambdaClientByRegion() {
-    Map<Region, LambdaClient> lambdaClientByRegion = new HashMap<>();
-    for (Region region : SUPPORTED_REGIONS) {
-      lambdaClientByRegion.put(region, getLambdaClientForProd(region));
-    }
-    return lambdaClientByRegion;
+  @Bean(name = "lambdaClientByRegion")
+  @Profile("!local")
+  public Map<Region, LambdaClient> lambdaClientByRegionProd() {
+    return getLambdaClientByRegion(this::getLambdaClientForProd);
   }
 
-  public LambdaClient getLambdaClientForProd(Region region) {
+  private LambdaClient getLambdaClientForProd(Region region) {
     return LambdaClient.builder()
         .region(region)
         .build();
   }
 
-  public LambdaClient getLambdaClientForLocalStack(Region region) {
+  @Bean(name = "lambdaClientByRegion")
+  @Profile("local")
+  public Map<Region, LambdaClient> lambdaClientByRegionLocal() {
+    return getLambdaClientByRegion(this::getLambdaClientForLocalStack);
+  }
+
+  private Map<Region, LambdaClient> getLambdaClientByRegion(
+      Function<Region, LambdaClient> lambdaCreator) {
+    Map<Region, LambdaClient> lambdaClientByRegion = new HashMap<>();
+    for (Region region : SUPPORTED_REGIONS) {
+      lambdaClientByRegion.put(region, lambdaCreator.apply(region));
+    }
+    return lambdaClientByRegion;
+  }
+
+  private LambdaClient getLambdaClientForLocalStack(Region region) {
     AwsCredentials credentials = AwsBasicCredentials.create("1", "2");
     return LambdaClient.builder()
         .region(region)
