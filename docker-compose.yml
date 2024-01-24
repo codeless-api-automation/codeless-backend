@@ -35,7 +35,3 @@ services:
       # LocalStack access to your computer's Docker daemon
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.cache/localstack/volume:/var/lib/localstack
-
-#networks:
-#  default:
-#    name: local_network
