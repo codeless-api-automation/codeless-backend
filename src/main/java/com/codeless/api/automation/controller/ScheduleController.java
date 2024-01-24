@@ -5,6 +5,7 @@ import static com.codeless.api.automation.util.RestApiConstant.SCHEDULES_RESOURC
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Schedule;
 import com.codeless.api.automation.service.ScheduleService;
+import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -26,14 +27,14 @@ public class ScheduleController {
   private final ScheduleService scheduleService;
 
   @PostMapping
-  public Schedule createSchedule(@RequestBody @Valid Schedule schedule) {
-    return scheduleService.runSchedule(schedule);
+  public Schedule createSchedule(@RequestBody @Valid Schedule schedule, Principal principal) {
+    return scheduleService.runSchedule(schedule, principal);
   }
 
   @GetMapping
   public Page<Schedule> getSchedules(@RequestParam(defaultValue = "0") Integer page,
-      @RequestParam(defaultValue = "5") Integer size) {
-    return scheduleService.getSchedules(page, size);
+      @RequestParam(defaultValue = "5") Integer size, Principal principal) {
+    return scheduleService.getSchedules(page, size, principal);
   }
 
 }

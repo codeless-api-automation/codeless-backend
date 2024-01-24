@@ -10,6 +10,7 @@ import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.ScheduleService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
   @Override
   @Transactional
-  public Schedule runSchedule(Schedule schedule) {
+  public Schedule runSchedule(Schedule schedule, Principal principal) {
     final String scheduleUuid = UUID.randomUUID().toString();
 
     com.codeless.api.automation.entity.Schedule preparedSchedule =
         scheduleDtoMapper.map(schedule);
     preparedSchedule.setUuid(scheduleUuid);
+    preparedSchedule.setUsername(principal.getName());
 
     com.codeless.api.automation.entity.Schedule persistedSchedule =
         scheduleRepository.save(preparedSchedule);
@@ -61,9 +63,9 @@ public class ScheduleServiceImpl implements ScheduleService {
   }
 
   @Override
-  public Page<Schedule> getSchedules(Integer page, Integer size) {
+  public Page<Schedule> getSchedules(Integer page, Integer size, Principal principal) {
     org.springframework.data.domain.Page<com.codeless.api.automation.entity.Schedule> schedules =
-        scheduleRepository.findAll(PageRequest.of(page, size));
+        scheduleRepository.findAllByUsername(principal.getName(), PageRequest.of(page, size));
 
     List<Schedule> schedulesDto = schedules.getContent().stream()
         .map(scheduleMapper::map)

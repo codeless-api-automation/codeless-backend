@@ -7,6 +7,7 @@ import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.dto.Test;
 import com.codeless.api.automation.service.TestService;
 import java.net.URI;
+import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,13 +34,13 @@ public class TestController {
   private final TestService testService;
 
   @PutMapping
-  public Test updateTest(@RequestBody @Valid Test test) {
-    return testService.updateTest(test);
+  public Test updateTest(@RequestBody @Valid Test test, Principal principal) {
+    return testService.updateTest(test, principal);
   }
 
   @PostMapping
-  public ResponseEntity<Test> createTest(@RequestBody @Valid Test test) {
-    Test createdTest = testService.saveTest(test);
+  public ResponseEntity<Test> createTest(@RequestBody @Valid Test test, Principal principal) {
+    Test createdTest = testService.saveTest(test, principal);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .location(URI.create(SINGLE_TEST_RESOURCE_WITH_ROOT_PATH + createdTest.getId()))
@@ -48,13 +49,13 @@ public class TestController {
 
   @GetMapping
   public Page<Test> getAllTests(@RequestParam(defaultValue = "0") Integer page,
-      @RequestParam(defaultValue = "5") Integer size) {
-    return testService.getAllTests(page, size);
+      @RequestParam(defaultValue = "5") Integer size, Principal principal) {
+    return testService.getAllTests(page, size, principal);
   }
 
   @DeleteMapping(path = "/{testId}")
-  public void deleteTest(@PathVariable Long testId) {
-    testService.deleteTest(testId);
+  public void deleteTest(@PathVariable Long testId, Principal principal) {
+    testService.deleteTest(testId, principal);
   }
 
 }

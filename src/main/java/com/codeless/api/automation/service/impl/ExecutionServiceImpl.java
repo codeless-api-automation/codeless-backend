@@ -20,18 +20,16 @@ import com.codeless.api.automation.service.TestSuiteBuilderService;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -50,17 +48,17 @@ public class ExecutionServiceImpl implements ExecutionService {
 
   @Override
   @Transactional
-  public Execution runExecution(Execution execution) {
+  public Execution runExecution(Execution execution, Principal principal) {
     com.codeless.api.automation.entity.Test test = testRepository.findById(execution.getTestId())
         .orElseThrow(() -> new ApiException("Test is not found", HttpStatus.BAD_REQUEST.value()));
 
     com.codeless.api.automation.entity.Execution preparedExecution =
         executionDtoMapper.map(execution);
     preparedExecution.setStatus(ExecutionStatus.PENDING);
+    preparedExecution.setUsername(principal.getName());
 
     com.codeless.api.automation.entity.Execution persistedExecution =
         executionRepository.save(preparedExecution);
-
 
     Map<String, String> payload = new HashMap<>();
     payload.putAll(taskLaunchArgumentsService
@@ -70,7 +68,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     payload.putAll(taskLaunchArgumentsService
         .getExecutionTypeArgument(ExecutionType.MANUAL_EXECUTION.getName()));
 
-    testingScheduleLocally(execution, persistedExecution, payload);
+    testingScheduleLocally(execution, persistedExecution, payload, principal);
 
     executionClient.execute(persistedExecution.getRegion().getAwsCloudRegion(), payload);
 
@@ -83,9 +81,9 @@ public class ExecutionServiceImpl implements ExecutionService {
   }
 
   @Override
-  public Page<Execution> getExecutions(Integer page, Integer size) {
+  public Page<Execution> getExecutions(Integer page, Integer size, Principal principal) {
     org.springframework.data.domain.Page<com.codeless.api.automation.entity.Execution> executions =
-        executionRepository.findAll(PageRequest.of(page, size));
+        executionRepository.findAllByUsername(principal.getName(), PageRequest.of(page, size));
 
     List<Execution> executionsDto = executions.getContent().stream()
         .map(executionMapper::map)
@@ -96,9 +94,9 @@ public class ExecutionServiceImpl implements ExecutionService {
   }
 
   @Override
-  public ExecutionResult getExecutionResult(long executionId) {
+  public ExecutionResult getExecutionResult(long executionId, Principal principal) {
     com.codeless.api.automation.entity.Execution execution = executionRepository
-        .findById(executionId)
+        .findByIdAndUsername(executionId, principal.getName())
         .orElseThrow(
             () -> new ApiException("The execution is not found!", HttpStatus.BAD_REQUEST.value()));
     return executionResultMapper.map(execution);
@@ -115,20 +113,17 @@ public class ExecutionServiceImpl implements ExecutionService {
   private void testingScheduleLocally(
       Execution execution,
       com.codeless.api.automation.entity.Execution persistedExecution,
-      Map<String, String> payload) {
+      Map<String, String> payload,
+      Principal principal) {
     // TODO: remove it before PROD
     // scheduler does not work locally so emulating manual execution as if it is scheduled
     if (execution.getName().contains("schedule")) {
       payload.putAll(taskLaunchArgumentsService
           .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()));
       List<Schedule> schedules =
-          scheduleRepository.findAllByTestIdAndUsername(persistedExecution.getTestId(), getUserName());
+          scheduleRepository.findAllByTestIdAndUsername(persistedExecution.getTestId(), principal.getName());
       payload.putAll(taskLaunchArgumentsService
           .getScheduleIdArgument(schedules.get(0).getId()));
     }
-  }
-
-  private String getUserName() {
-    return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getName());
   }
 }

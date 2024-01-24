@@ -22,7 +22,6 @@ public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automa
     com.codeless.api.automation.entity.Test test = new com.codeless.api.automation.entity.Test();
     test.setId(source.getId());
     test.setName(source.getName());
-    test.setUsername(getUserName());
     test.setJson(toString(source.getJson()));
     return test;
   }
@@ -33,9 +32,5 @@ public class TestDtoToTestMapper implements Mapper<Test, com.codeless.api.automa
     } catch (JsonProcessingException e) {
       throw new RuntimeException();
     }
-  }
-
-  private String getUserName() {
-    return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getName());
   }
 }

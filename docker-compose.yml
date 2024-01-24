@@ -36,6 +36,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.cache/localstack/volume:/var/lib/localstack
 
-networks:
-  default:
-    name: local_network
+#networks:
+#  default:
+#    name: local_network

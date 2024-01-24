@@ -14,6 +14,7 @@ import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,11 @@ public class TestServiceImpl implements TestService {
   private final ObjectMapper objectMapper;
 
   @Override
-  public Test updateTest(Test testDto) {
+  public Test updateTest(Test testDto, Principal principal) {
     Long testId = testDto.getId();
     if (testId != null) {
       com.codeless.api.automation.entity.Test existingTest = testRepository.findByIdAndUsername(
-              testId, getUserName())
+              testId, principal.getName())
           .orElseThrow(
               () -> new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value()));
       existingTest.setName(testDto.getName());
@@ -52,17 +53,19 @@ public class TestServiceImpl implements TestService {
   }
 
   @Override
-  public Test saveTest(Test testDto) {
+  public Test saveTest(Test testDto, Principal principal) {
     if (testDto.getId() == null) {
-      return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
+      com.codeless.api.automation.entity.Test testEntity = testDtoToTestMapper.map(testDto);
+      testEntity.setUsername(principal.getName());
+      return testToTestDtoMapper.map(testRepository.save(testEntity));
     }
     throw new ApiException("The id is not required!", HttpStatus.BAD_REQUEST.value());
   }
 
   @Override
-  public Page<Test> getAllTests(Integer page, Integer size) {
+  public Page<Test> getAllTests(Integer page, Integer size, Principal principal) {
     org.springframework.data.domain.Page<com.codeless.api.automation.entity.Test> tests =
-        testRepository.findAllByUsername(getUserName(), PageRequest.of(page, size));
+        testRepository.findAllByUsername(principal.getName(), PageRequest.of(page, size));
     List<Test> dtoTests = tests
         .getContent()
         .stream()
@@ -79,9 +82,9 @@ public class TestServiceImpl implements TestService {
   }
 
   @Override
-  public void deleteTest(Long id) {
+  public void deleteTest(Long id, Principal principal) {
     List<com.codeless.api.automation.entity.Schedule> schedules =
-        scheduleRepository.findAllByTestIdAndUsername(id, getUserName());
+        scheduleRepository.findAllByTestIdAndUsername(id, principal.getName());
     if (!schedules.isEmpty()) {
       throw new ApiException("There are schedules associated with this test. "
           + "Please delete schedules first before deleting the test.",
@@ -89,14 +92,14 @@ public class TestServiceImpl implements TestService {
     }
 
     List<Execution> executions = executionRepository.findAllByTestIdAndUsernameAndStatusIn(id,
-        getUserName(),
+        principal.getName(),
         Arrays.asList(ExecutionStatus.STARTED, ExecutionStatus.PENDING));
     if (!executions.isEmpty()) {
       throw new ApiException("Executions are in progress. "
           + "Please try to delete this test later.", HttpStatus.BAD_REQUEST.value());
     }
 
-    testRepository.deleteByIdAndUsername(id, getUserName());
+    testRepository.deleteByIdAndUsername(id, principal.getName());
   }
 
   private String toString(List<Map<Object, Object>> json) {
@@ -105,9 +108,5 @@ public class TestServiceImpl implements TestService {
     } catch (JsonProcessingException e) {
       throw new RuntimeException();
     }
-  }
-
-  private String getUserName() {
-    return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getName());
   }
 }

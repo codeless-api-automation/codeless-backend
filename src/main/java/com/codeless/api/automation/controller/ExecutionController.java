@@ -1,6 +1,5 @@
 package com.codeless.api.automation.controller;
 
-
 import static com.codeless.api.automation.util.RestApiConstant.EXECUTION_RESOURCE;
 import static com.codeless.api.automation.util.RestApiConstant.RESULT_RESOURCE;
 
@@ -8,6 +7,7 @@ import com.codeless.api.automation.dto.Execution;
 import com.codeless.api.automation.dto.ExecutionResult;
 import com.codeless.api.automation.dto.Page;
 import com.codeless.api.automation.service.ExecutionService;
+import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -30,18 +30,18 @@ public class ExecutionController {
   private final ExecutionService executionService;
 
   @PostMapping
-  public Execution createExecution(@RequestBody @Valid Execution execution) {
-    return executionService.runExecution(execution);
+  public Execution createExecution(@RequestBody @Valid Execution execution, Principal principal) {
+    return executionService.runExecution(execution, principal);
   }
 
   @GetMapping
   public Page<Execution> getExecutions(@RequestParam(defaultValue = "0") Integer page,
-      @RequestParam(defaultValue = "5") Integer size) {
-    return executionService.getExecutions(page, size);
+      @RequestParam(defaultValue = "5") Integer size, Principal principal) {
+    return executionService.getExecutions(page, size, principal);
   }
 
   @GetMapping("/{executionId}" + RESULT_RESOURCE)
-  public ExecutionResult getExecutionResult(@PathVariable long executionId) {
-    return executionService.getExecutionResult(executionId);
+  public ExecutionResult getExecutionResult(@PathVariable long executionId, Principal principal) {
+    return executionService.getExecutionResult(executionId, principal);
   }
 }
