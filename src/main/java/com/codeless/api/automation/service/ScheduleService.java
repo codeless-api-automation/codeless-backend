@@ -1,12 +1,15 @@
 package com.codeless.api.automation.service;
 
-import com.codeless.api.automation.dto.Page;
-import com.codeless.api.automation.dto.Schedule;
+import com.codeless.api.automation.dto.PageRequest;
+import com.codeless.api.automation.dto.ScheduleRequest;
 
 public interface ScheduleService {
 
-  Schedule runSchedule(Schedule schedule);
+  void createSchedule(ScheduleRequest scheduleRequest, String customerId);
 
-  Page<Schedule> getSchedules(Integer page, Integer size);
+  PageRequest<ScheduleRequest> getAllSchedules(
+      Integer maxResults,
+      String nextToken,
+      String customerId);
 
 }

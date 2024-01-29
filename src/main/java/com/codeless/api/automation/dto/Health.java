@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = Schedule.ScheduleBuilder.class)
+@JsonDeserialize(builder = Health.HealthBuilder.class)
 public class Health {
   String status;
 }

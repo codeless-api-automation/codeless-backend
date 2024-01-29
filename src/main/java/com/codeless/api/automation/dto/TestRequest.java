@@ -10,10 +10,10 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = Test.TestBuilder.class)
-public class Test {
+@JsonDeserialize(builder = TestRequest.TestRequestBuilder.class)
+public class TestRequest {
 
-  Long id;
+  String id;
   @NotBlank String name;
   @NotNull List<Map<Object, Object>> json;
 }

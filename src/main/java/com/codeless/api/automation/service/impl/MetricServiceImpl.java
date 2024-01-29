@@ -25,11 +25,16 @@ public class MetricServiceImpl implements MetricService {
   private final ScheduleRepository scheduleRepository;
 
   @Override
-  public Metrics getMetrics(MetricContext metricContext) {
-    Schedule schedule = scheduleRepository.findById(metricContext.getScheduleId())
-        .orElseThrow(() -> new ApiException("Schedule is not found", HttpStatus.BAD_REQUEST.value()));
+  public Metrics getMetrics(MetricContext metricContext, String customerId) {
+    Schedule schedule = scheduleRepository.get(metricContext.getScheduleId());
+    if (schedule == null) {
+      throw new ApiException("Schedule is not found", HttpStatus.BAD_REQUEST.value());
+    }
+    if (schedule.getCustomerId().equals(customerId)) {
+      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+    }
 
-    String key = String.format("uuid=%s", schedule.getUuid());
+    String key = String.format("uuid=%s", schedule.getId());
     List<TSElement> tsElements = timeSeriesRepository.getRange(key,
         metricContext.getStartDate().toInstant().getEpochSecond() * 1000,
         metricContext.getEndDate().toInstant().getEpochSecond() * 1000);

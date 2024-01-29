@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 
@@ -67,6 +69,32 @@ public class AwsClientConfiguration {
       schedulerClientByRegion.put(region, schedulerClient);
     }
     return schedulerClientByRegion;
+  }
+
+
+  @Bean(name = "dynamoDbEnhancedClient")
+  @Profile("!local")
+  public DynamoDbEnhancedClient dynamoDbEnhancedClientProd() {
+    DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
+        .build();
+    return DynamoDbEnhancedClient.builder()
+        .dynamoDbClient(dynamoDbClient)
+        .build();
+  }
+
+  @Bean(name = "dynamoDbEnhancedClient")
+  @Profile("local")
+  public DynamoDbEnhancedClient dynamoDbEnhancedClientLocal() {
+    return DynamoDbEnhancedClient.builder()
+        .dynamoDbClient(getDynamoDbClientLocal()).build();
+  }
+
+  private DynamoDbClient getDynamoDbClientLocal() {
+    AwsCredentials credentials = AwsBasicCredentials.create("1", "2");
+    return DynamoDbClient.builder()
+        .applyMutation(builder -> builder.endpointOverride(URI.create("http://localhost:4566")))
+        .credentialsProvider(StaticCredentialsProvider.create(credentials))
+        .build();
   }
 
 }

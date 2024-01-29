@@ -1,14 +1,5 @@
 version: '3.8'
 services:
-  postgres:
-    container_name: postgres
-    image: postgres:latest
-    environment:
-      LAMBDA_DOCKER_NETWORK: local_network
-      POSTGRES_PASSWORD: unbiasedc
-      POSTGRES_USER: unbiasedc
-    ports:
-      - 5432:5432
   redis:
     container_name: redis
     image: redislabs/redistimeseries
@@ -18,8 +9,9 @@ services:
     container_name: aws
     image: localstack/localstack:latest
     environment:
-      LAMBDA_EXECUTOR: local
       DEBUG: 1
+      AWS_DEFAULT_REGION: us-east-1
+      LAMBDA_EXECUTOR: local
       # Docker network that lambdas are reachable by.
       # This makes it easier for Lambads to be invoked by other
       # external Docker containers.
@@ -27,9 +19,9 @@ services:
       # Use our local files via Docker volumes to define our Lambdas
       LAMBDA_REMOTE_DOCKER: 0
       # Spin up the Lambda module
-      SERVICES: lambda
+      SERVICES: lambda,dynamodb
     ports:
-      - 4566:4566
+      - 4566-4583:4566-4583
     volumes:
       # Let LocalStack create new docker containers by giving
       # LocalStack access to your computer's Docker daemon

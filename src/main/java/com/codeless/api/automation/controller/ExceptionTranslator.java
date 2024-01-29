@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 @ControllerAdvice
 @Slf4j
@@ -19,6 +20,13 @@ public class ExceptionTranslator {
     return ResponseEntity.status(apiException.getStatusCode())
         .body(buildApiError(HttpStatus.valueOf(apiException.getStatusCode()),
             apiException.getMessage()));
+  }
+
+  @ExceptionHandler(DynamoDbException.class)
+  public ResponseEntity<ApiError> handleDynamoDbException(DynamoDbException dynamoDbException) {
+    log.error("Persistence error.", dynamoDbException);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(buildApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Please try again later."));
   }
 
   @ExceptionHandler(AuthenticationFailedException.class)

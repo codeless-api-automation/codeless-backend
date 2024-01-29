@@ -28,7 +28,7 @@ public class VerificationServiceImpl implements VerificationService {
   @Override
   public String createVerificationToken(User user) {
     return Base64.getUrlEncoder().encodeToString(
-        String.join(JOINER, user.getUuid(), user.getUsername(),
+        String.join(JOINER, user.getToken(), user.getUsername(),
             DATE_TIME_FORMATTER.format(LocalDateTime.now())).getBytes());
   }
 

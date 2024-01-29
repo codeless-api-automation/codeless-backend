@@ -1,76 +1,130 @@
 package com.codeless.api.automation.service.impl;
 
-import com.codeless.api.automation.dto.Page;
-import com.codeless.api.automation.dto.Schedule;
-import com.codeless.api.automation.entity.ExecutionType;
-import com.codeless.api.automation.mapper.ScheduleDtoMapper;
-import com.codeless.api.automation.mapper.ScheduleMapper;
-import com.codeless.api.automation.mapper.TimerDtoToContextMapper;
+import com.codeless.api.automation.appconfig.CountryConfig.RegionDetails;
+import com.codeless.api.automation.appconfig.CountryConfigProvider;
+import com.codeless.api.automation.converter.EmailListConverter;
+import com.codeless.api.automation.converter.NextTokenConverter;
+import com.codeless.api.automation.converter.TimerConverter;
+import com.codeless.api.automation.dto.PageRequest;
+import com.codeless.api.automation.dto.ScheduleRequest;
+import com.codeless.api.automation.entity.Schedule;
+import com.codeless.api.automation.entity.Test;
+import com.codeless.api.automation.entity.enums.ExecutionType;
+import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.ScheduleRepository;
+import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.ScheduleService;
+import com.codeless.api.automation.util.ObjectBuilder;
+import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
   private final SchedulerClientImpl schedulerClient;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
-  private final ScheduleDtoMapper scheduleDtoMapper;
-  private final ScheduleMapper scheduleMapper;
-  private final TimerDtoToContextMapper timerDtoToContextMapper;
   private final ScheduleRepository scheduleRepository;
+  private final TestRepository testRepository;
   private final CronExpressionBuilderService cronExpressionBuilderService;
+  private final TimerConverter timerConverter;
+  private final EmailListConverter emailListConverter;
+  private final CountryConfigProvider countryConfigProvider;
+  private final NextTokenConverter nextTokenConverter;
 
   @Override
-  @Transactional
-  public Schedule runSchedule(Schedule schedule) {
-    final String scheduleUuid = UUID.randomUUID().toString();
+  public void createSchedule(ScheduleRequest scheduleRequest, String customerId) {
+    Test test = testRepository.get(scheduleRequest.getTestId());
+    if (Objects.isNull(test)) {
+      throw new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value());
+    }
+    if (!test.getCustomerId().equals(customerId)) {
+      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+    }
 
-    com.codeless.api.automation.entity.Schedule preparedSchedule =
-        scheduleDtoMapper.map(schedule);
-    preparedSchedule.setUuid(scheduleUuid);
+    Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
+    if (!regionByName.containsKey(scheduleRequest.getRegion().getCity())) {
+      throw new ApiException(
+          String.format("Region with city name '%s' is not found.",
+              scheduleRequest.getRegion().getCity()), HttpStatus.BAD_REQUEST.value());
+    }
+    RegionDetails regionDetails = regionByName.get(scheduleRequest.getRegion().getCity());
 
-    com.codeless.api.automation.entity.Schedule persistedSchedule =
-        scheduleRepository.save(preparedSchedule);
+    Schedule scheduleEntity = new Schedule();
+    scheduleEntity.setId(RandomIdGenerator.generateScheduleId());
+    scheduleEntity.setCustomerId(customerId);
+    scheduleEntity.setName(scheduleRequest.getScheduleName());
+    scheduleEntity.setRegionName(regionDetails.getName());
+    scheduleEntity.setTimer(timerConverter.toString(scheduleRequest.getTimer()));
+    scheduleEntity.setEmails(emailListConverter.toString(scheduleRequest.getEmails()));
+    scheduleEntity.setTestId(scheduleRequest.getTestId());
+    scheduleEntity.setCreated(Instant.now());
+    scheduleEntity.setLastModified(Instant.now());
 
-    Map<String, String> payload = new HashMap<>();
-    payload.putAll(taskLaunchArgumentsService
-        .getScheduleIdArgument(persistedSchedule.getId()));
-    payload.putAll(taskLaunchArgumentsService
-        .getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()));
+    scheduleRepository.create(scheduleEntity);
 
-    schedulerClient.createSchedule(
-        persistedSchedule.getRegion().getAwsCloudRegion(),
-        scheduleUuid,
-        String.format("cron(%s)",
-        cronExpressionBuilderService.buildCronExpression(timerDtoToContextMapper.map(schedule.getTimer()))),
-        payload);
-
-    return scheduleMapper.map(persistedSchedule);
+    try {
+      schedulerClient.createSchedule(
+          regionDetails.getAwsCloudRegion(),
+          scheduleEntity.getId(),
+          String.format("cron(%s)",
+              cronExpressionBuilderService.buildCronExpression(
+                  ObjectBuilder.buildCronExpressionContext(scheduleRequest.getTimer()))),
+          buildPayload(scheduleEntity));
+    } catch (Exception exception) {
+      log.error("Schedule was not created for {}", scheduleEntity.getId(), exception);
+      scheduleRepository.delete(scheduleEntity.getId());
+      throw exception;
+    }
   }
 
   @Override
-  public Page<Schedule> getSchedules(Integer page, Integer size) {
-    org.springframework.data.domain.Page<com.codeless.api.automation.entity.Schedule> schedules =
-        scheduleRepository.findAll(PageRequest.of(page, size));
+  public PageRequest<ScheduleRequest> getAllSchedules(
+      Integer maxResults,
+      String nextToken,
+      String customerId) {
 
-    List<Schedule> schedulesDto = schedules.getContent().stream()
-        .map(scheduleMapper::map)
+    Page<Schedule> schedules = scheduleRepository.listSchedulesByCustomerId(
+        customerId,
+        nextTokenConverter.fromString(nextToken),
+        maxResults);
+
+    Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
+
+    List<ScheduleRequest> items = schedules.items().stream()
+        .map(schedule -> ScheduleRequest.builder()
+            .id(schedule.getId())
+            .scheduleName(schedule.getName())
+            .testId(schedule.getTestId())
+            .emails(emailListConverter.fromString(schedule.getEmails()))
+            .timer(timerConverter.fromString(schedule.getTimer()))
+            .region(ObjectBuilder.buildRegion(schedule.getRegionName(), regionByName))
+            .build())
         .collect(Collectors.toList());
 
-    return Page.<Schedule>builder()
-        .items(schedulesDto)
+    return PageRequest.<ScheduleRequest>builder()
+        .items(items)
+        .nextToken(nextTokenConverter.toString(schedules.lastEvaluatedKey()))
         .build();
+  }
+
+  private Map<String, String> buildPayload(Schedule scheduleEntity) {
+    Map<String, String> payload = new HashMap<>();
+    payload.putAll(taskLaunchArgumentsService.getScheduleIdArgument(scheduleEntity.getId()));
+    payload.putAll(taskLaunchArgumentsService.getExecutionTypeArgument(ExecutionType.SCHEDULED_EXECUTION.getName()));
+    return payload;
   }
 }

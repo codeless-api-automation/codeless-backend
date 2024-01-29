@@ -1,12 +1,12 @@
 package com.codeless.api.automation.service;
 
-import com.codeless.api.automation.dto.Page;
-import com.codeless.api.automation.dto.Test;
+import com.codeless.api.automation.dto.PageRequest;
+import com.codeless.api.automation.dto.TestRequest;
 
 public interface TestService {
 
-  Test updateTest(Test testDto);
-  Test saveTest(Test testDto);
-  Page<Test> getAllTests(Integer page, Integer size);
-  void deleteTest(Long id);
+  void updateTest(TestRequest testRequest, String customerId);
+  void createTest(TestRequest testRequest, String customerId);
+  PageRequest<TestRequest> getAllTests(Integer maxResults, String nextToken, String customerId);
+  void deleteTest(String id, String customerId);
 }

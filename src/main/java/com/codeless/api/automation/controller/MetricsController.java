@@ -5,6 +5,7 @@ import static com.codeless.api.automation.util.RestApiConstant.METRICS_RESOURCE;
 import com.codeless.api.automation.dto.MetricContext;
 import com.codeless.api.automation.dto.Metrics;
 import com.codeless.api.automation.service.MetricService;
+import java.security.Principal;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,15 +28,16 @@ public class MetricsController {
 
   @GetMapping
   public Metrics getMetrics(
-      @RequestParam(name = "schedule_id") Long scheduleId,
+      @RequestParam(name = "schedule_id") String scheduleId,
       @RequestParam(name = "start_date", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date startDate,
-      @RequestParam(name = "end_date", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date endDate) {
+      @RequestParam(name = "end_date", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date endDate,
+      Principal principal) {
 
     MetricContext metricContext = new MetricContext();
     metricContext.setScheduleId(scheduleId);
     metricContext.setStartDate(startDate == null ? new Date() : startDate);
     metricContext.setEndDate(endDate == null ? new Date() : endDate);
 
-    return metricService.getMetrics(metricContext);
+    return metricService.getMetrics(metricContext, principal.getName());
   }
 }

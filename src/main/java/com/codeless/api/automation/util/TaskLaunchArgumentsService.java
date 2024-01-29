@@ -20,11 +20,11 @@ public class TaskLaunchArgumentsService {
     return ImmutableMap.of(ArgumentConstant.EXECUTION_TYPE, executionType);
   }
 
-  public Map<String, String> getScheduleIdArgument(Long scheduleId) {
+  public Map<String, String> getScheduleIdArgument(String scheduleId) {
     return ImmutableMap.of(ArgumentConstant.SCHEDULE_ID, String.valueOf(scheduleId));
   }
 
-  public Map<String, String> getExecutionIdArgument(Long executionId) {
+  public Map<String, String> getExecutionIdArgument(String executionId) {
     return ImmutableMap.of(ArgumentConstant.EXECUTION_ID, String.valueOf(executionId));
   }
 

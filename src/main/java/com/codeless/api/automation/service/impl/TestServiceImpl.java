@@ -1,104 +1,107 @@
 package com.codeless.api.automation.service.impl;
 
-import static java.util.stream.Collectors.toList;
-
-import com.codeless.api.automation.dto.Page;
-import com.codeless.api.automation.dto.Test;
-import com.codeless.api.automation.entity.Execution;
-import com.codeless.api.automation.entity.ExecutionStatus;
+import com.codeless.api.automation.converter.NextTokenConverter;
+import com.codeless.api.automation.converter.TestConverter;
+import com.codeless.api.automation.dto.PageRequest;
+import com.codeless.api.automation.dto.TestRequest;
+import com.codeless.api.automation.entity.Schedule;
+import com.codeless.api.automation.entity.Test;
 import com.codeless.api.automation.exception.ApiException;
-import com.codeless.api.automation.mapper.Mapper;
-import com.codeless.api.automation.repository.ExecutionRepository;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
+import com.codeless.api.automation.util.RandomIdGenerator;
+import java.time.Instant;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 
 @Service
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
 
-  private final Mapper<Test, com.codeless.api.automation.entity.Test> testDtoToTestMapper;
-  private final Mapper<com.codeless.api.automation.entity.Test, Test> testToTestDtoMapper;
   private final TestRepository testRepository;
   private final ScheduleRepository scheduleRepository;
-  private final ExecutionRepository executionRepository;
-  private final ObjectMapper objectMapper;
+  private final TestConverter testConverter;
+  private final NextTokenConverter nextTokenConverter;
 
   @Override
-  public Test updateTest(Test testDto) {
-    Long testId = testDto.getId();
-    if (testId != null) {
-      com.codeless.api.automation.entity.Test existingTest = testRepository.findById(testId)
-          .orElseThrow(
-              () -> new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value()));
-      existingTest.setName(testDto.getName());
-      existingTest.setJson(toString(testDto.getJson()));
-      return testToTestDtoMapper.map(testRepository.save(existingTest));
+  public void updateTest(TestRequest testRequest, String customerId) {
+    String testId = testRequest.getId();
+    if (testId == null) {
+      throw new ApiException("The test is not created yet to be edited!",
+          HttpStatus.BAD_REQUEST.value());
     }
-    throw new ApiException("The test is not created yet to be edited!",
-        HttpStatus.BAD_REQUEST.value());
+    Test existingTest = testRepository.get(testId);
+    if (existingTest == null) {
+      throw new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value());
+    }
+    if (!existingTest.getCustomerId().equals(customerId)) {
+      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+    }
+    existingTest.setName(testRequest.getName());
+    existingTest.setJson(testConverter.toString(testRequest.getJson()));
+    existingTest.setLastModified(Instant.now());
+    testRepository.put(existingTest);
   }
 
   @Override
-  public Test saveTest(Test testDto) {
-    if (testDto.getId() == null) {
-      return testToTestDtoMapper.map(testRepository.save(testDtoToTestMapper.map(testDto)));
-    }
-    throw new ApiException("The id is not required!", HttpStatus.BAD_REQUEST.value());
+  public void createTest(TestRequest testRequest, String customerId) {
+    Test test = new Test();
+    test.setId(RandomIdGenerator.generateTestId());
+    test.setName(testRequest.getName());
+    test.setJson(testConverter.toString(testRequest.getJson()));
+    test.setCustomerId(customerId);
+    test.setCreated(Instant.now());
+    test.setLastModified(Instant.now());
+    testRepository.create(test);
   }
 
   @Override
-  public Page<Test> getAllTests(Integer page, Integer size) {
-    org.springframework.data.domain.Page<com.codeless.api.automation.entity.Test> tests =
-        testRepository.findAll(PageRequest.of(page, size));
-    List<Test> dtoTests = tests
-        .getContent()
-        .stream()
-        .map(testToTestDtoMapper::map)
-        .collect(toList());
-    return Page.<Test>builder()
-        .size(tests.getSize())
-        .number(tests.getNumber())
-        .totalPages(tests.getTotalPages())
-        .totalElements(tests.getTotalElements())
-        .numberOfElements(tests.getNumberOfElements())
-        .items(dtoTests)
+  public PageRequest<TestRequest> getAllTests(
+      Integer maxResults,
+      String nextToken,
+      String customerId) {
+
+    Page<Test> tests = testRepository.listTestsByCustomerId(
+        customerId,
+        nextTokenConverter.fromString(nextToken),
+        maxResults);
+
+    List<TestRequest> items = tests.items().stream()
+        .map(test -> TestRequest.builder()
+            .id(test.getId())
+            .name(test.getName())
+            .json(testConverter.fromString(test.getJson()))
+            .build())
+        .collect(Collectors.toList());
+
+    return PageRequest.<TestRequest>builder()
+        .nextToken(nextTokenConverter.toString(tests.lastEvaluatedKey()))
+        .items(items)
         .build();
   }
 
   @Override
-  public void deleteTest(Long id) {
-    List<com.codeless.api.automation.entity.Schedule> schedules =
-        scheduleRepository.findAllByTestId(id);
-    if (!schedules.isEmpty()) {
+  public void deleteTest(String testId, String customerId) {
+    Test existingTest = testRepository.get(testId);
+    if (existingTest == null) {
+      throw new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value());
+    }
+    if (!existingTest.getCustomerId().equals(customerId)) {
+      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+    }
+    Page<Schedule> schedules =
+        scheduleRepository.listSchedulesByTestId(testId, null, 1);
+    if (!schedules.items().isEmpty()) {
       throw new ApiException("There are schedules associated with this test. "
-          + "Please delete schedules first before deleting the test.", HttpStatus.BAD_REQUEST.value());
+          + "Please delete schedules first before deleting the test.",
+          HttpStatus.BAD_REQUEST.value());
     }
-
-    List<Execution> executions = executionRepository.findAllByTestIdAndStatusIn(id,
-        Arrays.asList(ExecutionStatus.STARTED, ExecutionStatus.PENDING));
-    if (!executions.isEmpty()) {
-      throw new ApiException("Executions are in progress. "
-          + "Please try to delete this test later.", HttpStatus.BAD_REQUEST.value());
-    }
-
-    testRepository.deleteById(id);
+    testRepository.delete(testId);
   }
 
-  private String toString(List<Map<Object, Object>> json) {
-    try {
-      return objectMapper.writeValueAsString(json);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException();
-    }
-  }
 }

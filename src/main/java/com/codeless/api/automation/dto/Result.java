@@ -1,6 +1,6 @@
 package com.codeless.api.automation.dto;
 
-import com.codeless.api.automation.entity.TestStatus;
+import com.codeless.api.automation.entity.enums.TestStatus;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import lombok.Builder;

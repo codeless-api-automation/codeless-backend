@@ -1,0 +1,13 @@
+{
+  "countryByIso2Name": {
+    "US": {
+      "displayName": "US",
+      "regionByName": {
+        "New York": {
+          "awsCloudRegion": "us-east-1",
+          "defaultRegion": true
+        }
+      }
+    }
+  }
+}

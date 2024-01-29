@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.sql.DataSource;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -29,24 +28,20 @@ import org.springframework.web.filter.CorsFilter;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
-  private UserDetailsService userDetailsService;
-  @Autowired
-  private DataSource dataSource;
+  private UserDetailsService databaseUserDetailsService;
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService)
+    auth.userDetailsService(databaseUserDetailsService)
         .passwordEncoder(encoder())
         .and()
-        .authenticationProvider(authenticationProvider())
-        .jdbcAuthentication()
-        .dataSource(dataSource);
+        .authenticationProvider(authenticationProvider());
   }
 
   @Bean
   public DaoAuthenticationProvider authenticationProvider() {
     final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService);
+    authProvider.setUserDetailsService(databaseUserDetailsService);
     authProvider.setPasswordEncoder(encoder());
     return authProvider;
   }

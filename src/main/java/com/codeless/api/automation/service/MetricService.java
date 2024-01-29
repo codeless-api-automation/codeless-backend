@@ -5,5 +5,5 @@ import com.codeless.api.automation.dto.Metrics;
 
 public interface MetricService {
 
-  Metrics getMetrics(MetricContext metricContext);
+  Metrics getMetrics(MetricContext metricContext, String customerId);
 }

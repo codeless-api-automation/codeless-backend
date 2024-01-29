@@ -51,7 +51,7 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
             .build())
         .build();
 
-    //schedulerClient.createSchedule(createScheduleRequest);
+    schedulerClient.createSchedule(createScheduleRequest);
   }
 
   private String toString(Map<String, String> payload) {

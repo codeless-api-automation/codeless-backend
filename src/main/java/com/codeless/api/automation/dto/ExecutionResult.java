@@ -9,6 +9,6 @@ import lombok.Value;
 @JsonDeserialize(builder = ExecutionResult.ExecutionResultBuilder.class)
 public class ExecutionResult {
 
-  Execution execution;
+  ExecutionRequest execution;
   Result result;
 }

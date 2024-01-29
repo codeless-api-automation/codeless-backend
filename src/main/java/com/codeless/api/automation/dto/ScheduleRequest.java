@@ -9,13 +9,13 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonDeserialize(builder = Schedule.ScheduleBuilder.class)
-public class Schedule {
+@JsonDeserialize(builder = ScheduleRequest.ScheduleRequestBuilder.class)
+public class ScheduleRequest {
 
   @NotEmpty String scheduleName;
-  @NotNull Long testId;
+  @NotNull String testId;
   @NotNull Region region;
   @NotNull Timer timer;
   List<String> emails;
-  Long id;
+  String id;
 }
