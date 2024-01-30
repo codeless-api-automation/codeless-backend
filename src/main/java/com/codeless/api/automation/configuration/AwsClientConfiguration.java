@@ -75,10 +75,13 @@ public class AwsClientConfiguration {
   @Bean(name = "dynamoDbEnhancedClient")
   @Profile("!local")
   public DynamoDbEnhancedClient dynamoDbEnhancedClientProd() {
-    DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
-        .build();
     return DynamoDbEnhancedClient.builder()
-        .dynamoDbClient(dynamoDbClient)
+        .dynamoDbClient(getDynamoDbClientProd())
+        .build();
+  }
+
+  private DynamoDbClient getDynamoDbClientProd() {
+    return DynamoDbClient.builder()
         .build();
   }
 

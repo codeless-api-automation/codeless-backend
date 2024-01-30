@@ -51,7 +51,7 @@ TABLE_TEST=$(cat <<EOF
   ],
   "GlobalSecondaryIndexes": [
     {
-      "IndexName": "GIS_TESTS_BY_CUSTOMER_ID",
+      "IndexName": "GSI_TESTS_BY_CUSTOMER_ID",
       "KeySchema": [
         {
           "AttributeName": "customerId",
@@ -101,7 +101,7 @@ TABLE_EXECUTION=$(cat <<EOF
   ],
   "GlobalSecondaryIndexes": [
     {
-      "IndexName": "GIS_EXECUTIONS_BY_CUSTOMER_ID",
+      "IndexName": "GSI_EXECUTIONS_BY_CUSTOMER_ID",
       "KeySchema": [
         {
           "AttributeName": "customerId",
@@ -120,7 +120,7 @@ TABLE_EXECUTION=$(cat <<EOF
       }
     },
     {
-      "IndexName": "GIS_EXECUTIONS_BY_SCHEDULE_ID",
+      "IndexName": "GSI_EXECUTIONS_BY_SCHEDULE_ID",
       "KeySchema": [
         {
           "AttributeName": "scheduleId",
@@ -139,10 +139,6 @@ TABLE_EXECUTION=$(cat <<EOF
       }
     }
   ],
-  "TimeToLiveDescription": {
-    "AttributeName": "ttl",
-    "TimeToLiveStatus": "ENABLED"
-  },
   "BillingMode": "PAY_PER_REQUEST"
 }
 EOF
@@ -176,7 +172,7 @@ TABLE_SCHEDULE=$(cat <<EOF
   ],
   "GlobalSecondaryIndexes": [
     {
-      "IndexName": "GIS_SCHEDULES_BY_CUSTOMER_ID",
+      "IndexName": "GSI_SCHEDULES_BY_CUSTOMER_ID",
       "KeySchema": [
         {
           "AttributeName": "customerId",
@@ -195,7 +191,7 @@ TABLE_SCHEDULE=$(cat <<EOF
       }
     },
     {
-      "IndexName": "GIS_SCHEDULES_BY_TEST_ID",
+      "IndexName": "GSI_SCHEDULES_BY_TEST_ID",
       "KeySchema": [
         {
           "AttributeName": "testId",

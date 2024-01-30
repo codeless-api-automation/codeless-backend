@@ -24,7 +24,7 @@ import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +75,8 @@ public class ExecutionServiceImpl implements ExecutionService {
     execution.setExecutionStatus(ExecutionStatus.PENDING);
     execution.setRegionName(regionDetails.getName());
     execution.setTestId(executionRequest.getTestId());
+    execution.setLastModified(Instant.now());
+    execution.setCreated(Instant.now());
     execution.setTtl(ExecutionUtil.getDefaultExecutionExpirationTime());
 
     executionRepository.create(execution);
@@ -150,7 +152,8 @@ public class ExecutionServiceImpl implements ExecutionService {
 
   private List<Test> toTests(String json) {
     try {
-      return objectMapper.readValue(json, new TypeReference<List<Test>>(){});
+      return objectMapper.readValue(json, new TypeReference<>() {
+      });
     } catch (Exception exception) {
       throw new RuntimeException();
     }
