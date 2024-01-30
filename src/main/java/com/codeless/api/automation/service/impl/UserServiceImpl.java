@@ -58,16 +58,16 @@ public class UserServiceImpl implements UserService {
 
   private User encodeUser(UserRegistration userRegistration) {
     String password = passwordEncoder.encode(userRegistration.getPassword());
-    return User.builder()
-        .token(UUID.randomUUID().toString())
-        .username(userRegistration.getEmail())
-        .password(password)
-        .firstName(userRegistration.getFirstName())
-        .lastName(userRegistration.getLastName())
-        .isEnabled(false)
-        .isAccountNonExpired(true)
-        .isCredentialsNonExpired(true)
-        .isAccountNonLocked(true)
-        .build();
+    User user = new User();
+    user.setToken(UUID.randomUUID().toString());
+    user.setUsername(userRegistration.getEmail());
+    user.setPassword(password);
+    user.setFirstName(userRegistration.getFirstName());
+    user.setLastName(userRegistration.getLastName());
+    user.setEnabled(false);
+    user.setAccountNonExpired(true);
+    user.setCredentialsNonExpired(true);
+    user.setAccountNonLocked(true);
+    return user;
   }
 }

@@ -109,7 +109,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             .id(schedule.getId())
             .scheduleName(schedule.getName())
             .testId(schedule.getTestId())
-            .emails(emailListConverter.fromString(schedule.getEmails()))
             .timer(timerConverter.fromString(schedule.getTimer()))
             .region(ObjectBuilder.buildRegion(schedule.getRegionName(), regionByName))
             .build())

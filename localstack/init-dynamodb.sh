@@ -27,6 +27,7 @@ TABLE_USER=$(cat <<EOF
 }
 EOF
 )
+
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb create-table --cli-input-json "$TABLE_USER")
 
 TABLE_TEST=$(cat <<EOF
@@ -71,6 +72,146 @@ TABLE_TEST=$(cat <<EOF
 }
 EOF
 )
+
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb create-table --cli-input-json "$TABLE_TEST")
+
+
+TABLE_EXECUTION=$(cat <<EOF
+{
+  "TableName": "execution",
+  "KeySchema": [
+    {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+    }
+  ],
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "customerId",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "scheduleId",
+      "AttributeType": "S"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "GIS_EXECUTIONS_BY_CUSTOMER_ID",
+      "KeySchema": [
+        {
+          "AttributeName": "customerId",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "INCLUDE",
+        "NonKeyAttributes": [
+          "id",
+          "name",
+          "type",
+          "executionStatus",
+          "regionName"
+        ]
+      }
+    },
+    {
+      "IndexName": "GIS_EXECUTIONS_BY_SCHEDULE_ID",
+      "KeySchema": [
+        {
+          "AttributeName": "scheduleId",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "INCLUDE",
+        "NonKeyAttributes": [
+          "id",
+          "name",
+          "type",
+          "executionStatus",
+          "regionName"
+        ]
+      }
+    }
+  ],
+  "TimeToLiveDescription": {
+    "AttributeName": "ttl",
+    "TimeToLiveStatus": "ENABLED"
+  },
+  "BillingMode": "PAY_PER_REQUEST"
+}
+EOF
+)
+
+echo $(aws --endpoint-url ${ENDPOINT} dynamodb create-table --cli-input-json "$TABLE_EXECUTION")
+
+
+TABLE_SCHEDULE=$(cat <<EOF
+{
+  "TableName": "schedule",
+  "KeySchema": [
+    {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+    }
+  ],
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "customerId",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "testId",
+      "AttributeType": "S"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "GIS_SCHEDULES_BY_CUSTOMER_ID",
+      "KeySchema": [
+        {
+          "AttributeName": "customerId",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "INCLUDE",
+        "NonKeyAttributes": [
+          "id",
+          "name",
+          "testId",
+          "timer",
+          "regionName"
+        ]
+      }
+    },
+    {
+      "IndexName": "GIS_SCHEDULES_BY_TEST_ID",
+      "KeySchema": [
+        {
+          "AttributeName": "testId",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "KEYS_ONLY"
+      }
+    }
+  ],
+  "BillingMode": "PAY_PER_REQUEST"
+}
+EOF
+)
+
+echo $(aws --endpoint-url ${ENDPOINT} dynamodb create-table --cli-input-json "$TABLE_SCHEDULE")
 
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb list-tables)

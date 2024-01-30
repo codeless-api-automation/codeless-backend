@@ -18,11 +18,13 @@ import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.ExecutionClient;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.TestSuiteBuilderService;
+import com.codeless.api.automation.util.ExecutionUtil;
 import com.codeless.api.automation.util.ObjectBuilder;
 import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +75,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     execution.setExecutionStatus(ExecutionStatus.PENDING);
     execution.setRegionName(regionDetails.getName());
     execution.setTestId(executionRequest.getTestId());
+    execution.setTtl(ExecutionUtil.getDefaultExecutionExpirationTime());
 
     executionRepository.create(execution);
 
@@ -109,7 +112,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             .id(execution.getId())
             .name(execution.getName())
             .type(execution.getType())
-            .testId(execution.getTestId())
+            .executionStatus(execution.getExecutionStatus())
             .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
             .build())
         .collect(Collectors.toList());
