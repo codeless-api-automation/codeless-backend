@@ -2,7 +2,6 @@ package com.codeless.api.automation.util;
 
 import com.codeless.api.automation.constant.ArgumentConstant;
 import com.google.common.collect.ImmutableMap;
-import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,11 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class TaskLaunchArgumentsService {
-
-  public Map<String, String> getTestSuiteArgument(String testSuite) {
-    byte[] encodedTestSuite = Base64.getEncoder().encode(testSuite.getBytes());
-    return ImmutableMap.of("suite", new String(encodedTestSuite));
-  }
 
   public Map<String, String> getExecutionTypeArgument(String executionType) {
     return ImmutableMap.of(ArgumentConstant.EXECUTION_TYPE, executionType);

@@ -4,7 +4,6 @@ import com.codeless.api.automation.appconfig.CountryConfig.RegionDetails;
 import com.codeless.api.automation.appconfig.CountryConfigProvider;
 import com.codeless.api.automation.converter.LogsConverter;
 import com.codeless.api.automation.converter.NextTokenConverter;
-import com.codeless.api.automation.domain.Test;
 import com.codeless.api.automation.dto.ExecutionRequest;
 import com.codeless.api.automation.dto.ExecutionResult;
 import com.codeless.api.automation.dto.PageRequest;
@@ -17,13 +16,10 @@ import com.codeless.api.automation.repository.ExecutionRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.ExecutionClient;
 import com.codeless.api.automation.service.ExecutionService;
-import com.codeless.api.automation.service.TestSuiteBuilderService;
 import com.codeless.api.automation.util.ExecutionUtil;
 import com.codeless.api.automation.util.ObjectBuilder;
 import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -43,13 +39,11 @@ public class ExecutionServiceImpl implements ExecutionService {
 
   private final ExecutionClient executionClient;
   private final TaskLaunchArgumentsService taskLaunchArgumentsService;
-  private final TestSuiteBuilderService testSuiteBuilderService;
   private final ExecutionRepository executionRepository;
   private final LogsConverter logsConverter;
   private final NextTokenConverter nextTokenConverter;
   private final TestRepository testRepository;
   private final CountryConfigProvider countryConfigProvider;
-  private final ObjectMapper objectMapper;
 
   @Override
   public ExecutionRequest createExecution(ExecutionRequest executionRequest, String customerId) {
@@ -84,8 +78,6 @@ public class ExecutionServiceImpl implements ExecutionService {
     executionRepository.create(execution);
 
     Map<String, String> payload = new HashMap<>();
-    payload.putAll(taskLaunchArgumentsService
-        .getTestSuiteArgument(testSuiteBuilderService.build(toTests(test.getJson()))));
     payload.putAll(taskLaunchArgumentsService
         .getExecutionIdArgument(execution.getId()));
     payload.putAll(taskLaunchArgumentsService
@@ -156,14 +148,6 @@ public class ExecutionServiceImpl implements ExecutionService {
             .logs(logsConverter.fromString(execution.getLogs()))
             .build())
         .build();
-  }
-
-  private List<Test> toTests(String json) {
-    try {
-      return objectMapper.readValue(json, new TypeReference<List<Test>>(){});
-    } catch (Exception exception) {
-      throw new RuntimeException();
-    }
   }
 
 }

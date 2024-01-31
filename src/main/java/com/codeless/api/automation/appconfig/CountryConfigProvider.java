@@ -3,23 +3,24 @@ package com.codeless.api.automation.appconfig;
 import com.codeless.api.automation.appconfig.CountryConfig.Country;
 import com.codeless.api.automation.appconfig.CountryConfig.RegionDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.ResourceUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.FileCopyUtils;
 
 @RequiredArgsConstructor
 public class CountryConfigProvider {
 
+  private final ResourceLoader resourceLoader;
   private final ObjectMapper objectMapper;
 
   public CountryConfig getCountryConfig() {
     try {
-      File file = ResourceUtils.getFile("classpath:config/countries.json");
-      String countries = new String(Files.readAllBytes(file.toPath()));
-      return objectMapper.readValue(countries, CountryConfig.class);
+      Resource resource = resourceLoader.getResource("classpath:config/countries.json");
+      byte[] countriesInBinary = FileCopyUtils.copyToByteArray(resource.getInputStream());
+      return objectMapper.readValue(new String(countriesInBinary), CountryConfig.class);
     } catch (Exception exp) {
       throw new RuntimeException(exp);
     }

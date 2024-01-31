@@ -4,12 +4,15 @@ import com.codeless.api.automation.appconfig.CountryConfigProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 public class ConfigProviderConfiguration {
 
   @Bean
-  public CountryConfigProvider countryConfigProvider(ObjectMapper objectMapper) {
-    return new CountryConfigProvider(objectMapper);
+  public CountryConfigProvider countryConfigProvider(
+      ResourceLoader resourceLoader,
+      ObjectMapper objectMapper) {
+    return new CountryConfigProvider(resourceLoader, objectMapper);
   }
 }

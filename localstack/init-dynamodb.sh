@@ -7,6 +7,7 @@ export AWS_DEFAULT_REGION="us-east-1"
 
 # Point aws-cli to LocalStack instead of AWS
 ENDPOINT=http://localhost:4566/
+#ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/
 
 TABLE_USER=$(cat <<EOF
 {
