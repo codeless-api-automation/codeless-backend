@@ -35,6 +35,7 @@ public class CountryConfigProvider {
         RegionDetails regionDetail = regionDetailsEntry.getValue();
         regionDetail.setCountryIso2Name(countryEntry.getKey());
         regionDetail.setCountryDisplayName(countryEntry.getValue().getDisplayName());
+        regionDetail.setName(regionDetailsEntry.getKey());
         regionByName.put(regionDetailsEntry.getKey(), regionDetail);
       }
     }

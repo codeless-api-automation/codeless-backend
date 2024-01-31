@@ -31,10 +31,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExecutionServiceImpl implements ExecutionService {
@@ -55,7 +57,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     if (test == null) {
       throw new ApiException("Test is not found", HttpStatus.BAD_REQUEST.value());
     }
-    if (test.getCustomerId().equals(customerId)) {
+    if (!test.getCustomerId().equals(customerId)) {
       throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -89,7 +91,13 @@ public class ExecutionServiceImpl implements ExecutionService {
     payload.putAll(taskLaunchArgumentsService
         .getExecutionTypeArgument(ExecutionType.MANUAL_EXECUTION.getName()));
 
-    executionClient.execute(regionDetails.getAwsCloudRegion(), payload);
+    try {
+      executionClient.execute(regionDetails.getAwsCloudRegion(), payload);
+    } catch (Exception exception) {
+      log.error("Execution was not created for {}", execution.getId(), exception);
+      executionRepository.delete(execution.getId());
+      throw exception;
+    }
 
     return ExecutionRequest.builder()
         .id(execution.getId())
@@ -152,8 +160,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
   private List<Test> toTests(String json) {
     try {
-      return objectMapper.readValue(json, new TypeReference<>() {
-      });
+      return objectMapper.readValue(json, new TypeReference<List<Test>>(){});
     } catch (Exception exception) {
       throw new RuntimeException();
     }
