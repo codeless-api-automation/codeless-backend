@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 
@@ -14,6 +15,8 @@ import lombok.Value;
 public class TestRequest {
 
   String id;
-  @NotBlank String name;
+  @NotBlank
+  @Size(max = 64)
+  String name;
   @NotNull List<Map<Object, Object>> json;
 }

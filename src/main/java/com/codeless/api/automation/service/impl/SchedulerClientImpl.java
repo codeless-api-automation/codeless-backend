@@ -38,7 +38,7 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
         region,
         awsConfiguration.getFunctionName());
     Target sqsTarget = Target.builder()
-        .roleArn(String.format("arn:aws:iam::*:role/%s", awsConfiguration.getScheduleRoleName()))
+        .roleArn(String.format("arn:aws:iam:*:*:role/%s", awsConfiguration.getScheduleRoleName()))
         .arn(lambda)
         .input(toString(payload))
         .build();

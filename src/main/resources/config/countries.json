@@ -3,7 +3,7 @@
     "US": {
       "displayName": "US",
       "regionByName": {
-        "New York": {
+        "N. Virginia": {
           "awsCloudRegion": "us-east-1",
           "defaultRegion": true
         }

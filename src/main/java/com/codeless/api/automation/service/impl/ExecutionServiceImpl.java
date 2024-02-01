@@ -66,7 +66,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     Execution execution = new Execution();
     execution.setId(RandomIdGenerator.generateExecutionId());
     execution.setCustomerId(customerId);
-    execution.setName(executionRequest.getName());
+    execution.setName(test.getName());
     execution.setType(executionRequest.getType());
     execution.setExecutionStatus(ExecutionStatus.PENDING);
     execution.setRegionName(regionDetails.getName());
@@ -96,6 +96,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
         .testId(execution.getTestId())
         .name(execution.getName())
+        .submitted(execution.getCreated())
         .build();
   }
 
@@ -116,6 +117,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             .type(execution.getType())
             .executionStatus(execution.getExecutionStatus())
             .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
+            .submitted(execution.getCreated())
             .build())
         .collect(Collectors.toList());
     return PageRequest.<ExecutionRequest>builder()
