@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # AWS configuration
-export AWS_ACCESS_KEY_ID="AKIAYS2NS7ACQ45WJ6NB"
-export AWS_SECRET_ACCESS_KEY="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"
+export AWS_ACCESS_KEY_ID="test1"
+export AWS_SECRET_ACCESS_KEY="test2"
 export AWS_DEFAULT_REGION="us-east-1"
 
 # Point aws-cli to LocalStack instead of AWS
