@@ -7,6 +7,8 @@ services:
       - spring_redis_host=redis
       - spring_redis_port=6379
       - spring_mail_password=
+      - codeless_spi_trusted_caller_api_key=
+      - codeless_aws_schedule_account_id=
     ports:
       - 8080:8080
     depends_on:

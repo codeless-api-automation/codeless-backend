@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # AWS configuration
-export AWS_ACCESS_KEY_ID="test"
-export AWS_SECRET_ACCESS_KEY="test"
+export AWS_ACCESS_KEY_ID="AKIAYS2NS7ACQ45WJ6NB"
+export AWS_SECRET_ACCESS_KEY="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"
 export AWS_DEFAULT_REGION="us-east-1"
 
 # Point aws-cli to LocalStack instead of AWS
-ENDPOINT=http://localhost:4566/
-#ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/
+#ENDPOINT=http://localhost:4566/
+ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/
 
 TABLE_USER=$(cat <<EOF
 {

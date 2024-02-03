@@ -24,13 +24,13 @@ public class CronExpressionBuilderServiceImpl implements CronExpressionBuilderSe
   public String buildCronExpression(CronExpressionContext cronExpressionContext) {
     switch (cronExpressionContext.getType()) {
       case "MINUTE_TIMER":
-        return String.format("%s * * * *",
+        return String.format("%s * ? * * *",
             minute.get(cronExpressionContext.getMinute()));
       case "HOUR_TIMER":
-        return String.format("0 %s * * *",
+        return String.format("0 %s ? * * *",
             hour.get(cronExpressionContext.getHour()));
       case "WEEK_TIMER":
-        return String.format("0 %s * * %s",
+        return String.format("0 %s ? * %s *",
             time.get(cronExpressionContext.getTime()),
             week.get(cronExpressionContext.getWeek()));
     }

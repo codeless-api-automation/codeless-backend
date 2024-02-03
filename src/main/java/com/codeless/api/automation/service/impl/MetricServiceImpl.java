@@ -2,6 +2,7 @@ package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.dto.MetricContext;
 import com.codeless.api.automation.dto.Metrics;
+import com.codeless.api.automation.dto.PutMetricRequest;
 import com.codeless.api.automation.dto.TimeSeriesElement;
 import com.codeless.api.automation.entity.Schedule;
 import com.codeless.api.automation.exception.ApiException;
@@ -30,12 +31,11 @@ public class MetricServiceImpl implements MetricService {
     if (schedule == null) {
       throw new ApiException("Schedule is not found", HttpStatus.BAD_REQUEST.value());
     }
-    if (schedule.getCustomerId().equals(customerId)) {
+    if (!schedule.getCustomerId().equals(customerId)) {
       throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
     }
 
-    String key = String.format("uuid=%s", schedule.getId());
-    List<TSElement> tsElements = timeSeriesRepository.getRange(key,
+    List<TSElement> tsElements = timeSeriesRepository.getRange(buildKey(schedule.getId()),
         metricContext.getStartDate().toInstant().getEpochSecond() * 1000,
         metricContext.getEndDate().toInstant().getEpochSecond() * 1000);
 
@@ -45,4 +45,18 @@ public class MetricServiceImpl implements MetricService {
 
     return new Metrics(timeSeriesElements);
   }
+
+  @Override
+  public void putMetrics(String scheduleId, PutMetricRequest metricRequest) {
+    // do not check if schedule id exists on purpose, not to consume extra read capacity from DDB
+    timeSeriesRepository.add(buildKey(scheduleId),
+        metricRequest.getTimestamp(),
+        metricRequest.getValue(),
+        metricRequest.getLabels());
+  }
+
+  private String buildKey(String scheduleId) {
+    return String.format("id=%s", scheduleId);
+  }
+
 }

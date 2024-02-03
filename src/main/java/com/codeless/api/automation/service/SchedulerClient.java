@@ -9,4 +9,8 @@ public interface SchedulerClient {
       String scheduleName,
       String scheduleExpression,
       Map<String, String> payload);
+
+  void deleteSchedule(
+      String region,
+      String scheduleName);
 }

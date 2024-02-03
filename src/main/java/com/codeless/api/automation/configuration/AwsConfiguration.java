@@ -12,4 +12,6 @@ public class AwsConfiguration {
   private String functionName;
   @Value("${codeless.aws.schedule-role-name}")
   private String scheduleRoleName;
+  @Value("${codeless.aws.schedule-account-id}")
+  private String scheduleAccountId;
 }

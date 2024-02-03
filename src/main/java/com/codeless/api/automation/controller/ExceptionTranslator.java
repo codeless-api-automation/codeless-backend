@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 @ControllerAdvice
@@ -22,11 +23,13 @@ public class ExceptionTranslator {
             apiException.getMessage()));
   }
 
-  @ExceptionHandler(DynamoDbException.class)
-  public ResponseEntity<ApiError> handleDynamoDbException(DynamoDbException dynamoDbException) {
-    log.error("Persistence error.", dynamoDbException);
+  @ExceptionHandler(AwsServiceException.class)
+  public ResponseEntity<ApiError> handleAwsServiceException(
+      AwsServiceException awsServiceException) {
+    log.error("Aws Service error.", awsServiceException);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(buildApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Please try again later."));
+        .body(buildApiError(HttpStatus.INTERNAL_SERVER_ERROR,
+            "Please create a support ticket."));
   }
 
   @ExceptionHandler(AuthenticationFailedException.class)

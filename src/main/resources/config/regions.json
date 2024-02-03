@@ -1,0 +1,24 @@
+{
+  "us-east-1": {
+    "components": [
+      {
+        "name": "scheduler",
+        "cells": [
+          {
+            "name": "cell01",
+            "accountId": ""
+          }
+        ]
+      },
+      {
+        "name": "lambda",
+        "cells": [
+          {
+            "name": "cell01",
+            "accountId": ""
+          }
+        ]
+      }
+    ]
+  }
+}

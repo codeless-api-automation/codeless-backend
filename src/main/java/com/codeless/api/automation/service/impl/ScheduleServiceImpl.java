@@ -7,6 +7,7 @@ import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.converter.TimerConverter;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.ScheduleRequest;
+import com.codeless.api.automation.dto.UpdateScheduleRequest;
 import com.codeless.api.automation.entity.Schedule;
 import com.codeless.api.automation.entity.Test;
 import com.codeless.api.automation.entity.enums.ExecutionType;
@@ -118,6 +119,31 @@ public class ScheduleServiceImpl implements ScheduleService {
         .items(items)
         .nextToken(nextTokenConverter.toString(schedules.lastEvaluatedKey()))
         .build();
+  }
+
+  @Override
+  public void deleteSchedule(String scheduleId, String customerId) {
+    Schedule schedule = scheduleRepository.get(scheduleId);
+    if (Objects.isNull(schedule)) {
+      throw new ApiException("The schedule was not found!", HttpStatus.BAD_REQUEST.value());
+    }
+    if (!schedule.getCustomerId().equals(customerId)) {
+      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+    }
+    schedulerClient.deleteSchedule(schedule.getRegionName(), schedule.getId());
+    scheduleRepository.delete(scheduleId);
+  }
+
+  @Override
+  public void updateSchedule(UpdateScheduleRequest updateScheduleRequest, String customerId) {
+    Schedule schedule = scheduleRepository.get(updateScheduleRequest.getId());
+    if (Objects.isNull(schedule)) {
+      throw new ApiException("The schedule was not found!", HttpStatus.BAD_REQUEST.value());
+    }
+    if (!schedule.getCustomerId().equals(customerId)) {
+      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+    }
+    schedulerClient.updateSchedule(schedule.getRegionName(), schedule.getId(), null);
   }
 
   private Map<String, String> buildPayload(Schedule scheduleEntity) {

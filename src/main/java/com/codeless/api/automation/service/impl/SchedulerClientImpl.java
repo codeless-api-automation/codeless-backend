@@ -10,9 +10,12 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 import software.amazon.awssdk.services.scheduler.model.CreateScheduleRequest;
+import software.amazon.awssdk.services.scheduler.model.DeleteScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindow;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
+import software.amazon.awssdk.services.scheduler.model.ScheduleState;
 import software.amazon.awssdk.services.scheduler.model.Target;
+import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
 
 @Component
 @RequiredArgsConstructor
@@ -34,11 +37,14 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
           HttpStatus.BAD_REQUEST.value());
     }
 
-    String lambda = String.format("arn:aws:lambda:%s:*:function:%s",
+    String lambda = String.format("arn:aws:lambda:%s:%s:function:%s",
         region,
+        awsConfiguration.getScheduleAccountId(),
         awsConfiguration.getFunctionName());
     Target sqsTarget = Target.builder()
-        .roleArn(String.format("arn:aws:iam:*:*:role/%s", awsConfiguration.getScheduleRoleName()))
+        .roleArn(String.format("arn:aws:iam::%s:role/%s",
+            awsConfiguration.getScheduleAccountId(),
+            awsConfiguration.getScheduleRoleName()))
         .arn(lambda)
         .input(toString(payload))
         .build();
@@ -47,11 +53,41 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
         .scheduleExpression(scheduleExpression)
         .target(sqsTarget)
         .flexibleTimeWindow(FlexibleTimeWindow.builder()
+            .maximumWindowInMinutes(1)
             .mode(FlexibleTimeWindowMode.FLEXIBLE)
             .build())
         .build();
 
     schedulerClient.createSchedule(createScheduleRequest);
+  }
+
+  @Override
+  public void deleteSchedule(String region, String scheduleName) {
+    SchedulerClient schedulerClient = schedulerClientByRegion.get(Region.of(region));
+    if (schedulerClient == null) {
+      throw new ApiException("Requested region is not available yet",
+          HttpStatus.BAD_REQUEST.value());
+    }
+    DeleteScheduleRequest deleteScheduleRequest = DeleteScheduleRequest.builder()
+        .name(scheduleName)
+        .build();
+    schedulerClient.deleteSchedule(deleteScheduleRequest);
+  }
+
+  public void updateSchedule(
+      String region,
+      String scheduleName,
+      ScheduleState scheduleState) {
+    SchedulerClient schedulerClient = schedulerClientByRegion.get(Region.of(region));
+    if (schedulerClient == null) {
+      throw new ApiException("Requested region is not available yet",
+          HttpStatus.BAD_REQUEST.value());
+    }
+    UpdateScheduleRequest updateScheduleRequest = UpdateScheduleRequest.builder()
+        .state(scheduleState)
+        .name(scheduleName)
+        .build();
+    schedulerClient.updateSchedule(updateScheduleRequest);
   }
 
   private String toString(Map<String, String> payload) {

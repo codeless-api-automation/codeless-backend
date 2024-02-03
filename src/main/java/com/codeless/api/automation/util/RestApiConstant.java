@@ -15,6 +15,7 @@ public final class RestApiConstant {
   public static final String METRICS_RESOURCE = "/metrics";
   public static final String AUTH_RESOURCE = "/auth";
   public static final String HEALTH_RESOURCE = "/health";
+  public static final String SPI_PATH = "/spi";
 
   private RestApiConstant() {
   }
