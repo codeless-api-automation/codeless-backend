@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +31,7 @@ public class EmailServiceImpl implements EmailService {
   private final EmailConfiguration emailConfig;
 
   @Override
+  @Async("sendEmailTaskExecutor")
   public void sendEmail(User user) {
     MimeMessage mimeMessage = generateVerificationMessage(user);
     log.info("Sending email message to : '{}' ", user.getUsername());

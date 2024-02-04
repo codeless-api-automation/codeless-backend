@@ -6,8 +6,8 @@ export AWS_SECRET_ACCESS_KEY="test2"
 export AWS_DEFAULT_REGION="us-east-1"
 
 # Point aws-cli to LocalStack instead of AWS
-#ENDPOINT=http://localhost:4566/
-ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/
+ENDPOINT=http://localhost:4566/
+#ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/
 
 TABLE_USER=$(cat <<EOF
 {
@@ -48,6 +48,10 @@ TABLE_TEST=$(cat <<EOF
     {
       "AttributeName": "customerId",
       "AttributeType": "S"
+    },
+    {
+      "AttributeName": "created",
+      "AttributeType": "S"
     }
   ],
   "GlobalSecondaryIndexes": [
@@ -57,6 +61,10 @@ TABLE_TEST=$(cat <<EOF
         {
           "AttributeName": "customerId",
           "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "created",
+          "KeyType": "RANGE"
         }
       ],
       "Projection": {
@@ -98,6 +106,10 @@ TABLE_EXECUTION=$(cat <<EOF
     {
       "AttributeName": "scheduleId",
       "AttributeType": "S"
+    },
+    {
+      "AttributeName": "created",
+      "AttributeType": "S"
     }
   ],
   "GlobalSecondaryIndexes": [
@@ -107,6 +119,10 @@ TABLE_EXECUTION=$(cat <<EOF
         {
           "AttributeName": "customerId",
           "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "created",
+          "KeyType": "RANGE"
         }
       ],
       "Projection": {
@@ -116,8 +132,7 @@ TABLE_EXECUTION=$(cat <<EOF
           "name",
           "type",
           "executionStatus",
-          "regionName",
-          "created"
+          "regionName"
         ]
       }
     },
@@ -127,6 +142,10 @@ TABLE_EXECUTION=$(cat <<EOF
         {
           "AttributeName": "scheduleId",
           "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "created",
+          "KeyType": "RANGE"
         }
       ],
       "Projection": {

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.timeseries.TSElement;
 
@@ -47,7 +48,8 @@ public class MetricServiceImpl implements MetricService {
   }
 
   @Override
-  public void putMetrics(String scheduleId, PutMetricRequest metricRequest) {
+  @Async("putMetricTaskExecutor")
+  public void putMetric(String scheduleId, PutMetricRequest metricRequest) {
     // do not check if schedule id exists on purpose, not to consume extra read capacity from DDB
     timeSeriesRepository.add(buildKey(scheduleId),
         metricRequest.getTimestamp(),

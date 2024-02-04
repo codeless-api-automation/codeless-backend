@@ -8,5 +8,5 @@ public interface MetricService {
 
   Metrics getMetrics(MetricContext metricContext, String customerId);
 
-  void putMetrics(String scheduleId, PutMetricRequest metricRequest);
+  void putMetric(String scheduleId, PutMetricRequest metricRequest);
 }
