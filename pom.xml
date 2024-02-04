@@ -22,7 +22,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <lombok.version>1.18.16</lombok.version>
+    <lombok.version>1.18.30</lombok.version>
     <guava.version>32.0.0-jre</guava.version>
     <jedis.version>4.3.2</jedis.version>
   </properties>

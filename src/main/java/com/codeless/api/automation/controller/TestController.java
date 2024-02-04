@@ -5,8 +5,10 @@ import static com.codeless.api.automation.util.RestApiConstant.TEST_RESOURCE;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.TestRequest;
 import com.codeless.api.automation.service.TestService;
+import com.codeless.api.automation.util.ValidationUtil;
 import java.security.Principal;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +52,7 @@ public class TestController {
   @GetMapping
   public PageRequest<TestRequest> getAllTests(@RequestParam(defaultValue = "25") Integer maxResults,
       String nextToken, Principal principal) {
-    return testService.getAllTests(maxResults, nextToken, principal.getName());
+    return testService.getAllTests(ValidationUtil.validateMaxResults(maxResults), nextToken, principal.getName());
   }
 
   @DeleteMapping(path = "/{testId}")
