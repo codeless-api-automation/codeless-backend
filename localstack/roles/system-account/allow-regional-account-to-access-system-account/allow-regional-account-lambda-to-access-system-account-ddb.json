@@ -8,14 +8,11 @@
         "dynamodb:BatchGet*",
         "dynamodb:Get*",
         "dynamodb:Query",
-        "dynamodb:Scan",
         "dynamodb:BatchWrite*",
-        "dynamodb:Delete*",
         "dynamodb:Update*",
         "dynamodb:PutItem"
       ],
       "Resource": [
-        "arn:aws:dynamodb:*:*:table/user",
         "arn:aws:dynamodb:*:*:table/schedule",
         "arn:aws:dynamodb:*:*:table/execution",
         "arn:aws:dynamodb:*:*:table/test",
@@ -23,22 +20,6 @@
         "arn:aws:dynamodb:*:*:table/execution/index/*",
         "arn:aws:dynamodb:*:*:table/test/index/*"
       ]
-    },
-    {
-      "Sid": "Statement1",
-      "Effect": "Allow",
-      "Action": [
-        "scheduler:CreateSchedule",
-        "scheduler:DeleteSchedule"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iam:PassRole",
-      "Resource": "arn:aws:iam::*:role/codeless-schedule-role"
     }
   ]
 }
