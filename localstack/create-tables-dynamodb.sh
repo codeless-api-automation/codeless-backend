@@ -232,17 +232,4 @@ EOF
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb create-table --cli-input-json "$TABLE_SCHEDULE")
 
 
-ENABLE_TTL_ON_EXECUTION_TABLE=$(cat <<EOF
-{
-  "TimeToLiveSpecification": {
-    "AttributeName": "ttl",
-    "Enabled": true
-  }
-}
-EOF
-)
-
-echo $(aws dynamodb update-time-to-live --table-name execution --cli-input-json "$ENABLE_TTL_ON_EXECUTION_TABLE")
-
-
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb list-tables)
