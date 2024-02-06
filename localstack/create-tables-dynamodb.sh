@@ -78,12 +78,16 @@ TABLE_TEST=$(cat <<EOF
           "name",
           "json"
         ]
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
       }
     }
   ],
   "ProvisionedThroughput": {
-    "ReadCapacityUnits": 7,
-    "WriteCapacityUnits": 7
+    "ReadCapacityUnits": 2,
+    "WriteCapacityUnits": 2
   },
   "BillingMode": "PROVISIONED"
 }
@@ -142,6 +146,10 @@ TABLE_EXECUTION=$(cat <<EOF
           "executionStatus",
           "regionName"
         ]
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 3,
+        "WriteCapacityUnits": 3
       }
     },
     {
@@ -165,12 +173,16 @@ TABLE_EXECUTION=$(cat <<EOF
           "executionStatus",
           "regionName"
         ]
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 3,
+        "WriteCapacityUnits": 3
       }
     }
   ],
   "ProvisionedThroughput": {
-    "ReadCapacityUnits": 8,
-    "WriteCapacityUnits": 8
+    "ReadCapacityUnits": 2,
+    "WriteCapacityUnits": 2
   },
   "BillingMode": "PROVISIONED"
 }
@@ -222,6 +234,10 @@ TABLE_SCHEDULE=$(cat <<EOF
           "regionName",
           "scheduleState"
         ]
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 3,
+        "WriteCapacityUnits": 3
       }
     },
     {
@@ -234,12 +250,16 @@ TABLE_SCHEDULE=$(cat <<EOF
       ],
       "Projection": {
         "ProjectionType": "KEYS_ONLY"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 2,
+        "WriteCapacityUnits": 2
       }
     }
   ],
   "ProvisionedThroughput": {
-    "ReadCapacityUnits": 7,
-    "WriteCapacityUnits": 7
+    "ReadCapacityUnits": 2,
+    "WriteCapacityUnits": 2
   },
   "BillingMode": "PROVISIONED"
 }
