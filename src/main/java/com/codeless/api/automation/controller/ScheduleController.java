@@ -4,7 +4,6 @@ import static com.codeless.api.automation.util.RestApiConstant.SCHEDULES_RESOURC
 
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.ScheduleRequest;
-import com.codeless.api.automation.dto.TestRequest;
 import com.codeless.api.automation.dto.UpdateScheduleRequest;
 import com.codeless.api.automation.service.ScheduleService;
 import java.security.Principal;

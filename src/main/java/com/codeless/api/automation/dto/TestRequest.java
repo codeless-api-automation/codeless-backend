@@ -16,7 +16,7 @@ public class TestRequest {
 
   String id;
   @NotBlank
-  @Size(max = 64)
+  @Size(min = 4, max = 64, message = "The canary test name '${validatedValue}' must be between {min} and {max} characters long.")
   String name;
   @NotNull List<Map<Object, Object>> json;
 }

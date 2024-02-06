@@ -24,7 +24,12 @@ TABLE_USER=$(cat <<EOF
       "AttributeType": "S"
     }
   ],
-  "BillingMode": "PAY_PER_REQUEST"
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 3,
+    "WriteCapacityUnits": 3
+  },
+  "BillingMode": "PROVISIONED",
+  "MaxStorageSize": 1
 }
 EOF
 )
@@ -77,7 +82,12 @@ TABLE_TEST=$(cat <<EOF
       }
     }
   ],
-  "BillingMode": "PAY_PER_REQUEST"
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 7,
+    "WriteCapacityUnits": 7
+  },
+  "BillingMode": "PROVISIONED",
+  "MaxStorageSize": 5
 }
 EOF
 )
@@ -160,7 +170,12 @@ TABLE_EXECUTION=$(cat <<EOF
       }
     }
   ],
-  "BillingMode": "PAY_PER_REQUEST"
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 8,
+    "WriteCapacityUnits": 8
+  },
+  "BillingMode": "PROVISIONED",
+  "MaxStorageSize": 10
 }
 EOF
 )
@@ -207,7 +222,8 @@ TABLE_SCHEDULE=$(cat <<EOF
           "name",
           "testId",
           "timer",
-          "regionName"
+          "regionName",
+          "scheduleState"
         ]
       }
     },
@@ -224,7 +240,12 @@ TABLE_SCHEDULE=$(cat <<EOF
       }
     }
   ],
-  "BillingMode": "PAY_PER_REQUEST"
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 7,
+    "WriteCapacityUnits": 7
+  },
+  "BillingMode": "PROVISIONED",
+  "MaxStorageSize": 5
 }
 EOF
 )

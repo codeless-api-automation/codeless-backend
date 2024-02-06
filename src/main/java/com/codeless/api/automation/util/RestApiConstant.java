@@ -19,6 +19,8 @@ public final class RestApiConstant {
 
   public static final String X_SPI_API_KEY = "x-spi-api-key";
 
+  public static final String UNAUTHORIZED_MESSAGE = "Unauthorized to access!";
+
   private RestApiConstant() {
   }
 }
