@@ -267,6 +267,5 @@ EOF
 )
 
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb create-table --cli-input-json "$TABLE_SCHEDULE")
-
-
+echo $(aws --endpoint-url ${ENDPOINT} dynamodb update-time-to-live --table-name "$TABLE_SCHEDULE" --time-to-live-specification Enabled=true,AttributeName=e_at --region us-east-1)
 echo $(aws --endpoint-url ${ENDPOINT} dynamodb list-tables)

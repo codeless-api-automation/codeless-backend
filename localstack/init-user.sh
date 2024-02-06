@@ -1,0 +1,2 @@
+ENDPOINT=http://localhost:4566/
+echo $(aws --debug --endpoint-url ${ENDPOINT} dynamodb put-item --table-name user --item '{"firstName":{"S":"test"},"lastName":{"S":"testOn"},"password":{"S":"$2a$10$lNUNy/upjaFLlkNjKEnJ3.SbKGuvE0oA..YgFvJ0uP1eF88Fq1Ge6"},"isAccountNonExpired":{"BOOL":true},"isCredentialsNonExpired":{"BOOL":true},"isEnabled":{"BOOL":true},"isAccountNonLocked":{"BOOL":true},"token":{"S":"050c2fd8-309d-453a-a4ac-9a60b8c8e6ee"},"username":{"S":"test@gmail.com"}}')
