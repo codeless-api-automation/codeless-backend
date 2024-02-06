@@ -33,7 +33,8 @@ public class NextTokenConverter {
       return null;
     }
     try {
-      return encode(objectMapper.writeValueAsString(nextToken));
+      return encode(objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+          .writeValueAsString(nextToken));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
