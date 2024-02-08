@@ -10,6 +10,7 @@ import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.service.ExecutionService;
 import java.security.Principal;
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -38,7 +39,9 @@ public class ExecutionController {
 
   @GetMapping
   public PageRequest<ExecutionRequest> getAllExecutions(
-      @RequestParam(defaultValue = "25") Integer maxResults, String nextToken, Principal principal) {
+      @RequestParam(defaultValue = "25") Integer maxResults,
+      @Size(max = 200) String nextToken,
+      Principal principal) {
     return executionService.getAllExecutions(maxResults, nextToken, principal.getName());
   }
 

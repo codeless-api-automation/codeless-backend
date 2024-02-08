@@ -1,34 +1,37 @@
 package com.codeless.api.automation.converter;
 
+import com.codeless.api.automation.dto.NextToken;
+import com.codeless.api.automation.exception.ApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.Base64;
-import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
+@Slf4j
 @RequiredArgsConstructor
 public class NextTokenConverter {
 
   private final ObjectMapper objectMapper;
 
-  public Map<String, AttributeValue> fromString(String nextToken) {
+  public NextToken fromString(String nextToken) {
     if (Objects.isNull(nextToken)) {
       return null;
     }
     try {
-      return objectMapper.readValue(
-          decode(nextToken),
-          new TypeReference<Map<String, AttributeValue>>() {});
+      return objectMapper.readValue(decode(nextToken), new TypeReference<>() {
+      });
     } catch (JsonProcessingException e) {
-      throw new RuntimeException();
+      log.info("Invalid next token!", e);
+      throw new ApiException("Invalid next token!", HttpStatus.BAD_REQUEST.value());
     }
   }
 
-  public String toString(Map<String, AttributeValue> nextToken) {
+  public String toString(NextToken nextToken) {
     if (Objects.isNull(nextToken)) {
       return null;
     }

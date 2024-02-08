@@ -7,6 +7,7 @@ import com.codeless.api.automation.appconfig.CountryConfigProvider;
 import com.codeless.api.automation.converter.EmailListConverter;
 import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.converter.TimerConverter;
+import com.codeless.api.automation.dto.NextToken;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.ScheduleRequest;
 import com.codeless.api.automation.dto.UpdateScheduleRequest;
@@ -19,7 +20,9 @@ import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.ScheduleService;
+import com.codeless.api.automation.util.ApiValidationUtil;
 import com.codeless.api.automation.util.ObjectBuilder;
+import com.codeless.api.automation.util.PersistenceUtil;
 import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import java.time.Instant;
@@ -99,12 +102,15 @@ public class ScheduleServiceImpl implements ScheduleService {
   @Override
   public PageRequest<ScheduleRequest> getAllSchedules(
       Integer maxResults,
-      String nextToken,
+      String nextTokenAsString,
       String customerId) {
+    NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
+    ApiValidationUtil.validateNextTokenForRequestByCustomerId(nextToken);
+    ApiValidationUtil.validateNextTokenOwnership(nextToken, customerId);
 
     Page<Schedule> schedules = scheduleRepository.listSchedulesByCustomerId(
         customerId,
-        nextTokenConverter.fromString(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyForRequestByCustomerId(nextToken),
         maxResults);
 
     Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
@@ -119,10 +125,10 @@ public class ScheduleServiceImpl implements ScheduleService {
             .region(ObjectBuilder.buildRegion(schedule.getRegionName(), regionByName))
             .build())
         .collect(Collectors.toList());
-
     return PageRequest.<ScheduleRequest>builder()
         .items(items)
-        .nextToken(nextTokenConverter.toString(schedules.lastEvaluatedKey()))
+        .nextToken(nextTokenConverter.toString(
+            PersistenceUtil.buildNextTokenForRequestByCustomerId(schedules.lastEvaluatedKey())))
         .build();
   }
 

@@ -6,6 +6,7 @@ import com.codeless.api.automation.converter.LogsConverter;
 import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.dto.ExecutionRequest;
 import com.codeless.api.automation.dto.ExecutionResult;
+import com.codeless.api.automation.dto.NextToken;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.Result;
 import com.codeless.api.automation.entity.Execution;
@@ -16,9 +17,12 @@ import com.codeless.api.automation.repository.ExecutionRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.ExecutionClient;
 import com.codeless.api.automation.service.ExecutionService;
+import com.codeless.api.automation.util.ApiValidationUtil;
 import com.codeless.api.automation.util.ExecutionUtil;
 import com.codeless.api.automation.util.ObjectBuilder;
+import com.codeless.api.automation.util.PersistenceUtil;
 import com.codeless.api.automation.util.RandomIdGenerator;
+import com.codeless.api.automation.util.RestApiConstant;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import java.time.Instant;
 import java.util.HashMap;
@@ -103,11 +107,15 @@ public class ExecutionServiceImpl implements ExecutionService {
   @Override
   public PageRequest<ExecutionRequest> getAllExecutions(
       Integer maxResults,
-      String nextToken,
+      String nextTokenAsString,
       String customerId) {
+    NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
+    ApiValidationUtil.validateNextTokenForRequestByCustomerId(nextToken);
+    ApiValidationUtil.validateNextTokenOwnership(nextToken, customerId);
+
     Page<Execution> executions = executionRepository.listExecutionsByCustomerId(
         customerId,
-        nextTokenConverter.fromString(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyForRequestByCustomerId(nextToken),
         maxResults);
     Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
     List<ExecutionRequest> items = executions.items().stream()
@@ -122,7 +130,8 @@ public class ExecutionServiceImpl implements ExecutionService {
         .collect(Collectors.toList());
     return PageRequest.<ExecutionRequest>builder()
         .items(items)
-        .nextToken(nextTokenConverter.toString(executions.lastEvaluatedKey()))
+        .nextToken(nextTokenConverter.toString(
+            PersistenceUtil.buildNextTokenForRequestByCustomerId(executions.lastEvaluatedKey())))
         .build();
   }
 
@@ -133,7 +142,7 @@ public class ExecutionServiceImpl implements ExecutionService {
       throw new ApiException("The execution was not found!", HttpStatus.BAD_REQUEST.value());
     }
     if (!execution.getCustomerId().equals(customerId)) {
-      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+      throw new ApiException(RestApiConstant.UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
     Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
     return ExecutionResult.builder()

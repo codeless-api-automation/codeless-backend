@@ -8,6 +8,7 @@ import com.codeless.api.automation.dto.UpdateScheduleRequest;
 import com.codeless.api.automation.service.ScheduleService;
 import java.security.Principal;
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -51,7 +52,8 @@ public class ScheduleController {
   @GetMapping
   public PageRequest<ScheduleRequest> getAllSchedules(
       @RequestParam(defaultValue = "25") Integer maxResults,
-      String nextToken, Principal principal) {
+      @Size(max = 200) String nextToken,
+      Principal principal) {
     return scheduleService.getAllSchedules(maxResults, nextToken, principal.getName());
   }
 
