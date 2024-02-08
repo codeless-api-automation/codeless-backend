@@ -5,6 +5,7 @@ import static com.codeless.api.automation.util.RestApiConstant.TEST_RESOURCE;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.TestRequest;
 import com.codeless.api.automation.service.TestService;
+import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
@@ -53,7 +54,10 @@ public class TestController {
       @RequestParam(defaultValue = "25") Integer maxResults,
       @Size(max = 200) String nextToken,
       Principal principal) {
-    return testService.getAllTests(maxResults, nextToken, principal.getName());
+    return testService.getAllTests(
+        DefaultValueUtil.getMaxResultsOrDefault(maxResults),
+        nextToken,
+        principal.getName());
   }
 
   @DeleteMapping(path = "/{testId}")

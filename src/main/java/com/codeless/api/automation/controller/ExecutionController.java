@@ -8,6 +8,7 @@ import com.codeless.api.automation.dto.ExecutionRequest;
 import com.codeless.api.automation.dto.ExecutionResult;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.service.ExecutionService;
+import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
@@ -42,7 +43,10 @@ public class ExecutionController {
       @RequestParam(defaultValue = "25") Integer maxResults,
       @Size(max = 200) String nextToken,
       Principal principal) {
-    return executionService.getAllExecutions(maxResults, nextToken, principal.getName());
+    return executionService.getAllExecutions(
+        DefaultValueUtil.getMaxResultsOrDefault(maxResults),
+        nextToken,
+        principal.getName());
   }
 
   @GetMapping("/{executionId}" + RESULT_RESOURCE)

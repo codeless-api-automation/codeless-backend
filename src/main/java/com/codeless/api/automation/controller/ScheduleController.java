@@ -6,6 +6,7 @@ import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.ScheduleRequest;
 import com.codeless.api.automation.dto.UpdateScheduleRequest;
 import com.codeless.api.automation.service.ScheduleService;
+import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
@@ -54,7 +55,10 @@ public class ScheduleController {
       @RequestParam(defaultValue = "25") Integer maxResults,
       @Size(max = 200) String nextToken,
       Principal principal) {
-    return scheduleService.getAllSchedules(maxResults, nextToken, principal.getName());
+    return scheduleService.getAllSchedules(
+        DefaultValueUtil.getMaxResultsOrDefault(maxResults),
+        nextToken,
+        principal.getName());
   }
 
   @DeleteMapping(path = "/{scheduleId}")
