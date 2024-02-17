@@ -10,7 +10,6 @@ import lombok.Value;
 @JsonDeserialize(builder = NextToken.NextTokenBuilder.class)
 public class NextToken {
 
-  String customerId;
   String created;
   String id;
 

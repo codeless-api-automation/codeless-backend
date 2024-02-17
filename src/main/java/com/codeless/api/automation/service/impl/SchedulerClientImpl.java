@@ -1,5 +1,7 @@
 package com.codeless.api.automation.service.impl;
 
+import static com.codeless.api.automation.util.RestApiConstant.SUPPORT_TICKET_MESSAGE;
+
 import com.codeless.api.automation.configuration.AwsConfiguration;
 import com.codeless.api.automation.exception.ApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,8 +67,7 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
   public void deleteSchedule(String region, String scheduleName) {
     SchedulerClient schedulerClient = schedulerClientByRegion.get(Region.of(region));
     if (schedulerClient == null) {
-      throw new ApiException("Requested region is not available yet",
-          HttpStatus.BAD_REQUEST.value());
+      throw new ApiException(SUPPORT_TICKET_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
     DeleteScheduleRequest deleteScheduleRequest = DeleteScheduleRequest.builder()
         .name(scheduleName)

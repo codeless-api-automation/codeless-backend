@@ -19,6 +19,7 @@ import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
+import com.codeless.api.automation.service.MetricService;
 import com.codeless.api.automation.service.ScheduleService;
 import com.codeless.api.automation.util.ApiValidationUtil;
 import com.codeless.api.automation.util.ObjectBuilder;
@@ -51,6 +52,7 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final EmailListConverter emailListConverter;
   private final CountryConfigProvider countryConfigProvider;
   private final NextTokenConverter nextTokenConverter;
+  private final MetricService metricService;
 
   @Override
   public void createSchedule(ScheduleRequest scheduleRequest, String customerId) {
@@ -105,12 +107,11 @@ public class ScheduleServiceImpl implements ScheduleService {
       String nextTokenAsString,
       String customerId) {
     NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
-    ApiValidationUtil.validateNextTokenForRequestByCustomerId(nextToken);
-    ApiValidationUtil.validateNextTokenOwnership(nextToken, customerId);
+    ApiValidationUtil.validateNextTokenInListByCustomerId(nextToken);
 
     Page<Schedule> schedules = scheduleRepository.listSchedulesByCustomerId(
         customerId,
-        PersistenceUtil.buildLastEvaluatedKeyForRequestByCustomerId(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
 
     Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
@@ -128,7 +129,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     return PageRequest.<ScheduleRequest>builder()
         .items(items)
         .nextToken(nextTokenConverter.toString(
-            PersistenceUtil.buildNextTokenForRequestByCustomerId(schedules.lastEvaluatedKey())))
+            PersistenceUtil.buildNextTokenInListByCustomerId(schedules.lastEvaluatedKey())))
         .build();
   }
 
@@ -141,8 +142,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     if (!schedule.getCustomerId().equals(customerId)) {
       throw new ApiException(UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
-    schedulerClient.deleteSchedule(schedule.getRegionName(), schedule.getId());
+    Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
+    RegionDetails regionDetails = regionByName.get(schedule.getRegionName());
+
+    schedulerClient.deleteSchedule(regionDetails.getAwsCloudRegion(), schedule.getId());
     scheduleRepository.delete(scheduleId);
+    metricService.deleteMetric(scheduleId);
   }
 
   @Override

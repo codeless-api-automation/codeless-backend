@@ -110,12 +110,11 @@ public class ExecutionServiceImpl implements ExecutionService {
       String nextTokenAsString,
       String customerId) {
     NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
-    ApiValidationUtil.validateNextTokenForRequestByCustomerId(nextToken);
-    ApiValidationUtil.validateNextTokenOwnership(nextToken, customerId);
+    ApiValidationUtil.validateNextTokenInListByCustomerId(nextToken);
 
     Page<Execution> executions = executionRepository.listExecutionsByCustomerId(
         customerId,
-        PersistenceUtil.buildLastEvaluatedKeyForRequestByCustomerId(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
     Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
     List<ExecutionRequest> items = executions.items().stream()
@@ -131,7 +130,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     return PageRequest.<ExecutionRequest>builder()
         .items(items)
         .nextToken(nextTokenConverter.toString(
-            PersistenceUtil.buildNextTokenForRequestByCustomerId(executions.lastEvaluatedKey())))
+            PersistenceUtil.buildNextTokenInListByCustomerId(executions.lastEvaluatedKey())))
         .build();
   }
 
@@ -153,6 +152,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             .executionStatus(execution.getExecutionStatus())
             .type(execution.getType())
             .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
+            .submitted(execution.getCreated())
             .build())
         .result(Result.builder()
             .testStatus(execution.getTestStatus())

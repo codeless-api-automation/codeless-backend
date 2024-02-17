@@ -70,12 +70,11 @@ public class TestServiceImpl implements TestService {
       String nextTokenAsString,
       String customerId) {
     NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
-    ApiValidationUtil.validateNextTokenOwnership(nextToken, customerId);
-    ApiValidationUtil.validateNextTokenForRequestByCustomerId(nextToken);
+    ApiValidationUtil.validateNextTokenInListByCustomerId(nextToken);
 
     Page<Test> tests = testRepository.listTestsByCustomerId(
         customerId,
-        PersistenceUtil.buildLastEvaluatedKeyForRequestByCustomerId(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
     List<TestRequest> items = tests.items().stream()
         .map(test -> TestRequest.builder()
@@ -87,7 +86,7 @@ public class TestServiceImpl implements TestService {
 
     return PageRequest.<TestRequest>builder()
         .nextToken(nextTokenConverter.toString(
-            PersistenceUtil.buildNextTokenForRequestByCustomerId(tests.lastEvaluatedKey())))
+            PersistenceUtil.buildNextTokenInListByCustomerId(tests.lastEvaluatedKey())))
         .items(items)
         .build();
   }

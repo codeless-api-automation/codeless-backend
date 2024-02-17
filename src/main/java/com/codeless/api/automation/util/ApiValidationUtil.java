@@ -7,27 +7,11 @@ import org.springframework.http.HttpStatus;
 
 public class ApiValidationUtil {
 
-  public static void validateNextTokenOwnership(NextToken nextToken, String customerId) {
+  public static void validateNextTokenInListByCustomerId(NextToken nextToken) {
     if (Objects.isNull(nextToken)) {
       return;
     }
-
-    if (Objects.isNull(nextToken.getCustomerId())) {
-      throw new ApiException(RestApiConstant.UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
-    }
-
-    if (!customerId.equals(nextToken.getCustomerId())) {
-      throw new ApiException(RestApiConstant.UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
-    }
-  }
-
-  public static void validateNextTokenForRequestByCustomerId(NextToken nextToken) {
-    if (Objects.isNull(nextToken)) {
-      return;
-    }
-    if (Objects.isNull(nextToken.getCustomerId())
-        || Objects.isNull(nextToken.getId())
-        || Objects.isNull(nextToken.getCreated())) {
+    if (Objects.isNull(nextToken.getId()) || Objects.isNull(nextToken.getCreated())) {
       throw new ApiException("Invalid next token!", HttpStatus.BAD_REQUEST.value());
     }
   }

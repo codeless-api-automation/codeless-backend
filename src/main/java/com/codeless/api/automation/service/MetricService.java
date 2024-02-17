@@ -9,4 +9,6 @@ public interface MetricService {
   Metrics getMetrics(MetricContext metricContext, String customerId);
 
   void putMetric(String scheduleId, PutMetricRequest metricRequest);
+
+  void deleteMetric(String scheduleId);
 }
