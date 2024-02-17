@@ -100,7 +100,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
         .testId(execution.getTestId())
         .name(execution.getName())
-        .submitted(execution.getCreated())
+        .startDateTime(execution.getCreated())
         .build();
   }
 
@@ -124,7 +124,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             .type(execution.getType())
             .executionStatus(execution.getExecutionStatus())
             .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
-            .submitted(execution.getCreated())
+            .startDateTime(execution.getCreated())
             .build())
         .collect(Collectors.toList());
     return PageRequest.<ExecutionRequest>builder()
@@ -152,7 +152,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             .executionStatus(execution.getExecutionStatus())
             .type(execution.getType())
             .region(ObjectBuilder.buildRegion(execution.getRegionName(), regionByName))
-            .submitted(execution.getCreated())
+            .startDateTime(execution.getCreated())
             .build())
         .result(Result.builder()
             .testStatus(execution.getTestStatus())

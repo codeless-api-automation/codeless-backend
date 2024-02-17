@@ -52,7 +52,7 @@ public class ScheduleController {
 
   @GetMapping
   public PageRequest<ScheduleRequest> getAllSchedules(
-      @RequestParam(defaultValue = "25") Integer maxResults,
+      @RequestParam(defaultValue = "25") @Size(min = 1) Integer maxResults,
       @Size(max = 200) String nextToken,
       Principal principal) {
     return scheduleService.getAllSchedules(
