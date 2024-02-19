@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class RateLimitWebConfiguration implements WebMvcConfigurer {
 
     @Autowired RateLimitRequestInterceptor rateLimitRequestInterceptor;
-
     @Autowired AuthRateLimitRequestInterceptor authRateLimitRequestInterceptor;
 
     @Override
