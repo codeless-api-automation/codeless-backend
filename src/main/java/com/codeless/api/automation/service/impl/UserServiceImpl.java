@@ -3,6 +3,7 @@ package com.codeless.api.automation.service.impl;
 import com.codeless.api.automation.dto.UserRegistration;
 import com.codeless.api.automation.dto.UserVerification;
 import com.codeless.api.automation.entity.User;
+import com.codeless.api.automation.entity.enums.UserPlan;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.UserService;
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
   private final VerificationService verificationService;
   private final PasswordEncoder passwordEncoder;
 
-
+  @Override
   public User saveUser(UserRegistration userRegistration) {
     User user = userRepository.get(userRegistration.getEmail());
     if (Objects.nonNull(user) && !user.isEnabled()) {
@@ -41,6 +42,12 @@ public class UserServiceImpl implements UserService {
     return encodedUser;
   }
 
+  @Override
+  public User getUserByEmail(String email) {
+    return userRepository.get(email);
+  }
+
+  @Override
   public User verifyUser(String verificationToken) {
     UserVerification userVerification = verificationService.getUserVerification(verificationToken);
     User user = userRepository.get(userVerification.getEmail());
@@ -68,6 +75,7 @@ public class UserServiceImpl implements UserService {
     user.setAccountNonExpired(true);
     user.setCredentialsNonExpired(true);
     user.setAccountNonLocked(true);
+    user.setUserPlan(UserPlan.FREE);
     return user;
   }
 }

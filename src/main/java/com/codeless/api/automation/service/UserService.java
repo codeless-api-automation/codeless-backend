@@ -7,5 +7,7 @@ public interface UserService {
 
   User saveUser(UserRegistration userRegistration);
 
+  User getUserByEmail(String email);
+
   User verifyUser(String verificationToken);
 }
