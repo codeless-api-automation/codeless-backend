@@ -10,6 +10,7 @@ import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
+import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +41,17 @@ public class ExecutionController {
 
   @GetMapping
   public PageRequest<ExecutionRequest> getAllExecutions(
-      @RequestParam(defaultValue = "25") @Size(min = 1) Integer maxResults,
-      @Size(max = 200) String nextToken,
+      @RequestParam(name = "max_results", defaultValue = "25") @Size(min = 1) Integer maxResults,
+      @RequestParam(name = "next_token") @Size(max = 200) String nextToken,
+      @RequestParam(name = "schedule_id") @Size(min = 40, max = 40) String scheduleId,
       Principal principal) {
+    if (Objects.nonNull(scheduleId)) {
+      return executionService.getExecutionsByScheduleId(
+          scheduleId,
+          DefaultValueUtil.getMaxResultsOrDefault(maxResults),
+          nextToken,
+          principal.getName());
+    }
     return executionService.getAllExecutions(
         DefaultValueUtil.getMaxResultsOrDefault(maxResults),
         nextToken,

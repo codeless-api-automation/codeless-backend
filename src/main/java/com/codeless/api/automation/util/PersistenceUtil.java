@@ -29,4 +29,26 @@ public class PersistenceUtil {
         .build();
   }
 
+  public static Map<String, AttributeValue> buildLastEvaluatedKeyInListByScheduleId(
+      NextToken nextToken, String scheduleId) {
+    if (Objects.isNull(nextToken)) {
+      return null;
+    }
+    return Map.of(
+        "scheduleId", AttributeValue.builder().s(scheduleId).build(),
+        "created", AttributeValue.builder().s(nextToken.getCreated()).build(),
+        "id", AttributeValue.builder().s(nextToken.getId()).build());
+  }
+
+  public static NextToken buildNextTokenInListByScheduleId(
+      Map<String, AttributeValue> lastEvaluatedKey) {
+    if (Objects.isNull(lastEvaluatedKey)) {
+      return null;
+    }
+    return NextToken.builder()
+        .created(lastEvaluatedKey.get("created").s())
+        .id(lastEvaluatedKey.get("id").s())
+        .build();
+  }
+
 }

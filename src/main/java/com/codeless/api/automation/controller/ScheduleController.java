@@ -52,8 +52,8 @@ public class ScheduleController {
 
   @GetMapping
   public PageRequest<ScheduleRequest> getAllSchedules(
-      @RequestParam(defaultValue = "25") @Size(min = 1) Integer maxResults,
-      @Size(max = 200) String nextToken,
+      @RequestParam(name = "max_results", defaultValue = "25") @Size(min = 1) Integer maxResults,
+      @RequestParam(name = "next_token") @Size(max = 200) String nextToken,
       Principal principal) {
     return scheduleService.getAllSchedules(
         DefaultValueUtil.getMaxResultsOrDefault(maxResults),

@@ -11,5 +11,10 @@ public interface ExecutionService {
       Integer maxResults,
       String nextToken,
       String customerId);
+  PageRequest<ExecutionRequest> getExecutionsByScheduleId(
+      String scheduleId,
+      Integer maxResults,
+      String nextToken,
+      String customerId);
   ExecutionResult getExecutionResult(String executionId, String customerId);
 }

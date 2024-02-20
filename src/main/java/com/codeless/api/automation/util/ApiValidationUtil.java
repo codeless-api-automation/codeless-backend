@@ -11,9 +11,19 @@ public class ApiValidationUtil {
     if (Objects.isNull(nextToken)) {
       return;
     }
+    validateToken(nextToken);
+  }
+
+  public static void validateNextTokenInListByScheduleId(NextToken nextToken) {
+    if (Objects.isNull(nextToken)) {
+      return;
+    }
+    validateToken(nextToken);
+  }
+
+  private static void validateToken(NextToken nextToken) {
     if (Objects.isNull(nextToken.getId()) || Objects.isNull(nextToken.getCreated())) {
       throw new ApiException("Invalid next token!", HttpStatus.BAD_REQUEST.value());
     }
   }
-
 }
