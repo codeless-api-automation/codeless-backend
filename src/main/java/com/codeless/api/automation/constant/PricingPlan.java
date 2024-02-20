@@ -10,18 +10,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PricingPlan {
 
-    FREE(20),
+  FREE(20),
+  BASIC(40),
+  PROFESSIONAL(100);
 
-    BASIC(40),
+  private final int bucketCapacity;
 
-    PROFESSIONAL(100);
-
-    private final int bucketCapacity;
-
-
-    public Bandwidth getLimit() {
-      return Bandwidth.builder().capacity(bucketCapacity).refillIntervally(bucketCapacity, Duration.ofHours(1)).build();
-    }
+  public Bandwidth getLimit() {
+    return Bandwidth.builder().capacity(bucketCapacity)
+        .refillIntervally(bucketCapacity, Duration.ofHours(1)).build();
+  }
 
   public static PricingPlan resolvePricingFromUserPlan(UserPlan userPlan) {
     if (UserPlan.BASIC.equals(userPlan)) {
