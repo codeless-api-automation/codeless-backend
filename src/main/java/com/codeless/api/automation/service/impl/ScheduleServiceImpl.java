@@ -164,29 +164,37 @@ public class ScheduleServiceImpl implements ScheduleService {
     if (!schedule.getCustomerId().equals(customerId)) {
       throw new ApiException(UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
-
     String existingEmails = schedule.getEmails();
     String newEmails = emailListConverter.toString(updateScheduleRequest.getEmails());
-    if (Objects.nonNull(newEmails) && !newEmails.equals(existingEmails)) {
+    if (isValueChanged(existingEmails, newEmails)) {
       schedule.setEmails(newEmails);
     }
     ScheduleState existingScheduleState = schedule.getScheduleState();
     ScheduleState newScheduleState = updateScheduleRequest.getState();
-    if (Objects.nonNull(newScheduleState) && !existingScheduleState.equals(newScheduleState)) {
+    if (isValueChanged(existingScheduleState, newScheduleState)) {
       schedule.setScheduleState(newScheduleState);
     }
-    // TODO: update DDB
-    //scheduleRepository.put();
+    scheduleRepository.put(schedule);
 
-    // if old state is not equal to new state, then update schedule
-    try {
-      schedulerClient.updateSchedule(schedule.getRegionName(), schedule.getId(), null);
-    } catch (Exception exception) {
-      schedule.setEmails(existingEmails);
-      schedule.setScheduleState(existingScheduleState);
-      //scheduleRepository.put();
-      throw exception;
+    if (isValueChanged(existingScheduleState, newScheduleState)) {
+      try {
+        schedulerClient.updateSchedule(
+            schedule.getRegionName(),
+            schedule.getId(),
+            ScheduleState.ENABLED.equals(newScheduleState));
+      } catch (Exception exception) {
+        schedule.setEmails(existingEmails);
+        schedule.setScheduleState(existingScheduleState);
+        scheduleRepository.put(schedule);
+        throw exception;
+      }
     }
+  }
+
+  private boolean isValueChanged(
+      Object existingValue,
+      Object newValue) {
+    return Objects.nonNull(newValue) && !existingValue.equals(newValue);
   }
 
   private Map<String, String> buildPayload(Schedule scheduleEntity) {

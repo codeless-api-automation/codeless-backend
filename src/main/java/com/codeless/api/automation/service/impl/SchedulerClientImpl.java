@@ -78,14 +78,14 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
   public void updateSchedule(
       String region,
       String scheduleName,
-      ScheduleState scheduleState) {
+      boolean isEnabled) {
     SchedulerClient schedulerClient = schedulerClientByRegion.get(Region.of(region));
     if (schedulerClient == null) {
       throw new ApiException("Requested region is not available yet",
           HttpStatus.BAD_REQUEST.value());
     }
     UpdateScheduleRequest updateScheduleRequest = UpdateScheduleRequest.builder()
-        .state(scheduleState)
+        .state(isEnabled ? ScheduleState.ENABLED : ScheduleState.DISABLED)
         .name(scheduleName)
         .build();
     schedulerClient.updateSchedule(updateScheduleRequest);
