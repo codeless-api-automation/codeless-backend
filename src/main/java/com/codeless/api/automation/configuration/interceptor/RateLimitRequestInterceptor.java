@@ -5,6 +5,8 @@ import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.entity.enums.UserPlan;
 import com.codeless.api.automation.service.PricingPlanService;
 import com.codeless.api.automation.service.UserService;
+import com.codeless.api.automation.storage.RateLimitData;
+import com.codeless.api.automation.storage.RateLimitStorage;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import java.util.Objects;
@@ -25,20 +27,36 @@ public class RateLimitRequestInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
       Object object) {
-
-    final User userByEmail = userService.getUserByEmail(request.getUserPrincipal().getName());
-        if (Objects.isNull(userByEmail)) {
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
+    final String username = request.getUserPrincipal().getName();
+    final RateLimitData rateLimitData = getRateLimitData(request, response, username);
+    if (Objects.isNull(rateLimitData)) {
       return false;
     }
 
-    final Bucket tokenBucket = pricingPlanService.resolveBucketByUserPlan(UserPlan.FREE);
-    final ConsumptionProbe consumptionProbe = tokenBucket.tryConsumeAndReturnRemaining(1);
+    final ConsumptionProbe consumptionProbe = rateLimitData.getBucket()
+        .tryConsumeAndReturnRemaining(1);
     if (consumptionProbe.isConsumed()) {
-      response.addHeader(RateLimitHeader.X_RATE_LIMIT_REMAINING, String.valueOf(consumptionProbe.getRemainingTokens()));
+      response.addHeader(RateLimitHeader.X_RATE_LIMIT_REMAINING,
+          String.valueOf(consumptionProbe.getRemainingTokens()));
       return true;
     }
-      TooManyRequestErrorHandler.handleTooManyError(response, consumptionProbe);
-      return false;
+    TooManyRequestErrorHandler.handleTooManyError(response, consumptionProbe);
+    return false;
+  }
+
+  private RateLimitData getRateLimitData(HttpServletRequest request, HttpServletResponse response,
+      String username) {
+    RateLimitData rateLimitData = RateLimitStorage.getRateLimitData(username);
+    if (Objects.isNull(rateLimitData)) {
+      final User userByEmail = userService.getUserByEmail(request.getUserPrincipal().getName());
+      if (Objects.isNull(userByEmail)) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        return null;
+      }
+      final Bucket bucket = pricingPlanService.resolveBucketByUserPlan(userByEmail.getUserPlan());
+      rateLimitData = new RateLimitData().setUser(userByEmail).setBucket(bucket);
+      RateLimitStorage.addRateLimitData(username, rateLimitData);
     }
+    return rateLimitData;
+  }
 }
