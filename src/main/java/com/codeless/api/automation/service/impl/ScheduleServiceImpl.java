@@ -7,6 +7,7 @@ import com.codeless.api.automation.appconfig.CountryConfigProvider;
 import com.codeless.api.automation.converter.EmailListConverter;
 import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.converter.TimerConverter;
+import com.codeless.api.automation.dto.NextToken;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.ScheduleRequest;
 import com.codeless.api.automation.dto.UpdateScheduleRequest;
@@ -18,8 +19,11 @@ import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
+import com.codeless.api.automation.service.MetricService;
 import com.codeless.api.automation.service.ScheduleService;
+import com.codeless.api.automation.util.ApiValidationUtil;
 import com.codeless.api.automation.util.ObjectBuilder;
+import com.codeless.api.automation.util.PersistenceUtil;
 import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.TaskLaunchArgumentsService;
 import java.time.Instant;
@@ -48,6 +52,7 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final EmailListConverter emailListConverter;
   private final CountryConfigProvider countryConfigProvider;
   private final NextTokenConverter nextTokenConverter;
+  private final MetricService metricService;
 
   @Override
   public void createSchedule(ScheduleRequest scheduleRequest, String customerId) {
@@ -99,12 +104,14 @@ public class ScheduleServiceImpl implements ScheduleService {
   @Override
   public PageRequest<ScheduleRequest> getAllSchedules(
       Integer maxResults,
-      String nextToken,
+      String nextTokenAsString,
       String customerId) {
+    NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
+    ApiValidationUtil.validateNextTokenInListByCustomerId(nextToken);
 
     Page<Schedule> schedules = scheduleRepository.listSchedulesByCustomerId(
         customerId,
-        nextTokenConverter.fromString(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
 
     Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
@@ -119,10 +126,10 @@ public class ScheduleServiceImpl implements ScheduleService {
             .region(ObjectBuilder.buildRegion(schedule.getRegionName(), regionByName))
             .build())
         .collect(Collectors.toList());
-
     return PageRequest.<ScheduleRequest>builder()
         .items(items)
-        .nextToken(nextTokenConverter.toString(schedules.lastEvaluatedKey()))
+        .nextToken(nextTokenConverter.toString(
+            PersistenceUtil.buildNextTokenInListByCustomerId(schedules.lastEvaluatedKey())))
         .build();
   }
 
@@ -135,8 +142,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     if (!schedule.getCustomerId().equals(customerId)) {
       throw new ApiException(UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
-    schedulerClient.deleteSchedule(schedule.getRegionName(), schedule.getId());
+    Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
+    RegionDetails regionDetails = regionByName.get(schedule.getRegionName());
+
+    schedulerClient.deleteSchedule(regionDetails.getAwsCloudRegion(), schedule.getId());
     scheduleRepository.delete(scheduleId);
+    metricService.deleteMetric(scheduleId);
   }
 
   @Override
@@ -153,29 +164,37 @@ public class ScheduleServiceImpl implements ScheduleService {
     if (!schedule.getCustomerId().equals(customerId)) {
       throw new ApiException(UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
-
     String existingEmails = schedule.getEmails();
     String newEmails = emailListConverter.toString(updateScheduleRequest.getEmails());
-    if (Objects.nonNull(newEmails) && !newEmails.equals(existingEmails)) {
+    if (isValueChanged(existingEmails, newEmails)) {
       schedule.setEmails(newEmails);
     }
     ScheduleState existingScheduleState = schedule.getScheduleState();
     ScheduleState newScheduleState = updateScheduleRequest.getState();
-    if (Objects.nonNull(newScheduleState) && !existingScheduleState.equals(newScheduleState)) {
+    if (isValueChanged(existingScheduleState, newScheduleState)) {
       schedule.setScheduleState(newScheduleState);
     }
-    // TODO: update DDB
-    //scheduleRepository.put();
+    scheduleRepository.put(schedule);
 
-    // if old state is not equal to new state, then update schedule
-    try {
-      schedulerClient.updateSchedule(schedule.getRegionName(), schedule.getId(), null);
-    } catch (Exception exception) {
-      schedule.setEmails(existingEmails);
-      schedule.setScheduleState(existingScheduleState);
-      //scheduleRepository.put();
-      throw exception;
+    if (isValueChanged(existingScheduleState, newScheduleState)) {
+      try {
+        schedulerClient.updateSchedule(
+            schedule.getRegionName(),
+            schedule.getId(),
+            ScheduleState.ENABLED.equals(newScheduleState));
+      } catch (Exception exception) {
+        schedule.setEmails(existingEmails);
+        schedule.setScheduleState(existingScheduleState);
+        scheduleRepository.put(schedule);
+        throw exception;
+      }
     }
+  }
+
+  private boolean isValueChanged(
+      Object existingValue,
+      Object newValue) {
+    return Objects.nonNull(newValue) && !existingValue.equals(newValue);
   }
 
   private Map<String, String> buildPayload(Schedule scheduleEntity) {

@@ -12,12 +12,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AsyncConfiguration {
 
   @Bean
-  public ThreadPoolTaskExecutor sendEmailTaskExecutor() {
+  public ThreadPoolTaskExecutor emailTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(2);
     executor.setMaxPoolSize(2);
     executor.setQueueCapacity(500);
-    executor.setThreadNamePrefix("AsyncSendEmailThread-");
+    executor.setThreadNamePrefix("AsyncEmailThread-");
     executor.setRejectedExecutionHandler(
         (r, executor1) ->
             log.warn("Task rejected, send email thread pool is full and queue is also full"));
@@ -26,12 +26,12 @@ public class AsyncConfiguration {
   }
 
   @Bean
-  public ThreadPoolTaskExecutor putMetricTaskExecutor() {
+  public ThreadPoolTaskExecutor metricTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(2);
     executor.setMaxPoolSize(5);
     executor.setQueueCapacity(1000);
-    executor.setThreadNamePrefix("AsyncPutMetricThread-");
+    executor.setThreadNamePrefix("AsyncMetricThread-");
     executor.setRejectedExecutionHandler(
         (r, executor1) ->
             log.warn("Task rejected, put metric thread pool is full and queue is also full"));

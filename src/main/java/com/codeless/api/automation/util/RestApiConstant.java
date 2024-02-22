@@ -20,6 +20,7 @@ public final class RestApiConstant {
   public static final String X_SPI_API_KEY = "x-spi-api-key";
 
   public static final String UNAUTHORIZED_MESSAGE = "Unauthorized to access!";
+  public static final String SUPPORT_TICKET_MESSAGE = "Please create a support ticket.";
 
   private RestApiConstant() {
   }

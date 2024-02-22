@@ -22,5 +22,5 @@ public class ExecutionRequest {
   String testId;
   String name;
   ExecutionStatus executionStatus;
-  Instant submitted;
+  Instant startDateTime;
 }

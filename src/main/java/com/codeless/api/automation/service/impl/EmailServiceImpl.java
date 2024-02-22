@@ -31,7 +31,7 @@ public class EmailServiceImpl implements EmailService {
   private final EmailConfiguration emailConfig;
 
   @Override
-  @Async("sendEmailTaskExecutor")
+  @Async("emailTaskExecutor")
   public void sendEmail(User user) {
     MimeMessage mimeMessage = generateVerificationMessage(user);
     log.info("Sending email message to : '{}' ", user.getUsername());

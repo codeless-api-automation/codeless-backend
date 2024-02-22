@@ -2,6 +2,7 @@ package com.codeless.api.automation.service.impl;
 
 import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.converter.TestConverter;
+import com.codeless.api.automation.dto.NextToken;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.TestRequest;
 import com.codeless.api.automation.entity.Schedule;
@@ -10,7 +11,10 @@ import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
 import com.codeless.api.automation.service.TestService;
+import com.codeless.api.automation.util.ApiValidationUtil;
+import com.codeless.api.automation.util.PersistenceUtil;
 import com.codeless.api.automation.util.RandomIdGenerator;
+import com.codeless.api.automation.util.RestApiConstant;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,14 +67,15 @@ public class TestServiceImpl implements TestService {
   @Override
   public PageRequest<TestRequest> getAllTests(
       Integer maxResults,
-      String nextToken,
+      String nextTokenAsString,
       String customerId) {
+    NextToken nextToken = nextTokenConverter.fromString(nextTokenAsString);
+    ApiValidationUtil.validateNextTokenInListByCustomerId(nextToken);
 
     Page<Test> tests = testRepository.listTestsByCustomerId(
         customerId,
-        nextTokenConverter.fromString(nextToken),
+        PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
-
     List<TestRequest> items = tests.items().stream()
         .map(test -> TestRequest.builder()
             .id(test.getId())
@@ -80,7 +85,8 @@ public class TestServiceImpl implements TestService {
         .collect(Collectors.toList());
 
     return PageRequest.<TestRequest>builder()
-        .nextToken(nextTokenConverter.toString(tests.lastEvaluatedKey()))
+        .nextToken(nextTokenConverter.toString(
+            PersistenceUtil.buildNextTokenInListByCustomerId(tests.lastEvaluatedKey())))
         .items(items)
         .build();
   }
@@ -92,7 +98,7 @@ public class TestServiceImpl implements TestService {
       throw new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value());
     }
     if (!existingTest.getCustomerId().equals(customerId)) {
-      throw new ApiException("Unauthorized to access!", HttpStatus.UNAUTHORIZED.value());
+      throw new ApiException(RestApiConstant.UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
     Page<Schedule> schedules =
         scheduleRepository.listSchedulesByTestId(testId, null, 1);

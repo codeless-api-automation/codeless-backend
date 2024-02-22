@@ -1,5 +1,7 @@
 package com.codeless.api.automation.controller;
 
+import static com.codeless.api.automation.util.RestApiConstant.SUPPORT_TICKET_MESSAGE;
+
 import com.codeless.api.automation.dto.ApiError;
 import com.codeless.api.automation.exception.ApiException;
 import java.util.Date;
@@ -10,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 @ControllerAdvice
 @Slf4j
@@ -28,8 +29,7 @@ public class ExceptionTranslator {
       AwsServiceException awsServiceException) {
     log.error("Aws Service error.", awsServiceException);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(buildApiError(HttpStatus.INTERNAL_SERVER_ERROR,
-            "Please create a support ticket."));
+        .body(buildApiError(HttpStatus.INTERNAL_SERVER_ERROR, SUPPORT_TICKET_MESSAGE));
   }
 
   @ExceptionHandler(AuthenticationFailedException.class)
