@@ -52,7 +52,7 @@ public class TestController {
   @GetMapping
   public PageRequest<TestRequest> getAllTests(
       @RequestParam(name = "max_results", defaultValue = "25") @Size(min = 1) Integer maxResults,
-      @RequestParam(name = "next_token") @Size(max = 200) String nextToken,
+      @RequestParam(name = "next_token", required = false) @Size(max = 200) String nextToken,
       Principal principal) {
     return testService.getAllTests(
         DefaultValueUtil.getMaxResultsOrDefault(maxResults),
