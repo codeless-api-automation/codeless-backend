@@ -8,6 +8,7 @@ import com.codeless.api.automation.service.TestService;
 import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,8 @@ public class TestController {
 
   @GetMapping
   public PageRequest<TestRequest> getAllTests(
-      @RequestParam(name = "max_results", defaultValue = "25") @Size(min = 1) Integer maxResults,
+      @RequestParam(name = "max_results", defaultValue = "25")
+      @Min(value = 1, message="max_results is positive number, min 1 is required") Integer maxResults,
       @RequestParam(name = "next_token", required = false) @Size(max = 200) String nextToken,
       Principal principal) {
     return testService.getAllTests(
