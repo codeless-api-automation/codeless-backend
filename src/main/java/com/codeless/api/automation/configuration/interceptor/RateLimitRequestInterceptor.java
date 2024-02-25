@@ -1,8 +1,8 @@
 package com.codeless.api.automation.configuration.interceptor;
 
+import com.codeless.api.automation.configuration.RateLimitConfiguration;
 import com.codeless.api.automation.constant.RateLimitHeader;
 import com.codeless.api.automation.entity.User;
-import com.codeless.api.automation.entity.enums.UserPlan;
 import com.codeless.api.automation.service.PricingPlanService;
 import com.codeless.api.automation.service.UserService;
 import com.codeless.api.automation.storage.RateLimitData;
@@ -21,6 +21,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class RateLimitRequestInterceptor implements HandlerInterceptor {
 
+  private final RateLimitConfiguration rateLimitConfiguration;
   private final PricingPlanService pricingPlanService;
   private final UserService userService;
 
@@ -28,8 +29,15 @@ public class RateLimitRequestInterceptor implements HandlerInterceptor {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
       Object object) {
     final String username = request.getUserPrincipal().getName();
+    if (rateLimitConfiguration.getNotAllowedClients().contains(username)) {
+      RateLimitErrorHandler.handleForbiddenError(response,
+          RateLimitHeader.X_RATE_LIMIT_USER_NOT_ALLOWED, username);
+      return false;
+    }
     final RateLimitData rateLimitData = getRateLimitData(request, response, username);
     if (Objects.isNull(rateLimitData)) {
+      RateLimitErrorHandler.handleForbiddenError(response,
+          RateLimitHeader.X_RATE_LIMIT_USER_NOT_ALLOWED, username);
       return false;
     }
 
@@ -40,7 +48,7 @@ public class RateLimitRequestInterceptor implements HandlerInterceptor {
           String.valueOf(consumptionProbe.getRemainingTokens()));
       return true;
     }
-    TooManyRequestErrorHandler.handleTooManyError(response, consumptionProbe);
+    RateLimitErrorHandler.handleTooManyError(response, consumptionProbe);
     return false;
   }
 
