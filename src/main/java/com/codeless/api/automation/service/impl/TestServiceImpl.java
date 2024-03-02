@@ -1,5 +1,6 @@
 package com.codeless.api.automation.service.impl;
 
+import com.codeless.api.automation.appconfig.LimitsConfigProvider;
 import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.converter.TestConverter;
 import com.codeless.api.automation.dto.NextToken;
@@ -7,9 +8,11 @@ import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.TestRequest;
 import com.codeless.api.automation.entity.Schedule;
 import com.codeless.api.automation.entity.Test;
+import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
+import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.TestService;
 import com.codeless.api.automation.util.ApiValidationUtil;
 import com.codeless.api.automation.util.PersistenceUtil;
@@ -17,6 +20,7 @@ import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.RestApiConstant;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,6 +35,8 @@ public class TestServiceImpl implements TestService {
   private final ScheduleRepository scheduleRepository;
   private final TestConverter testConverter;
   private final NextTokenConverter nextTokenConverter;
+  private final UserRepository userRepository;
+  private final LimitsConfigProvider limitsConfigProvider;
 
   @Override
   public void updateTest(TestRequest testRequest, String customerId) {
@@ -54,6 +60,15 @@ public class TestServiceImpl implements TestService {
 
   @Override
   public void createTest(TestRequest testRequest, String customerId) {
+    User user = userRepository.get(customerId);
+
+    Integer allowedTestsLimit =
+        limitsConfigProvider.getTestsLimit(user.getUserPlan().getValue(), customerId);
+    if (Objects.nonNull(user.getTestsCounter()) && user.getTestsCounter() > allowedTestsLimit) {
+      throw new ApiException("You exceeded number of tests allowed by your plan. "
+          + "Please consider upgrading your plan.", HttpStatus.BAD_REQUEST.value());
+    }
+
     Test test = new Test();
     test.setId(RandomIdGenerator.generateTestId());
     test.setName(testRequest.getName());
@@ -62,6 +77,9 @@ public class TestServiceImpl implements TestService {
     test.setCreated(Instant.now());
     test.setLastModified(Instant.now());
     testRepository.create(test);
+
+    user.setTestsCounter(user.getTestsCounter() == null ? 1 : user.getTestsCounter() + 1);
+    userRepository.put(user);
   }
 
   @Override
@@ -108,6 +126,10 @@ public class TestServiceImpl implements TestService {
           HttpStatus.BAD_REQUEST.value());
     }
     testRepository.delete(testId);
+
+    User user = userRepository.get(customerId);
+    user.setTestsCounter(Objects.isNull(user.getTestsCounter()) ? 0 : user.getTestsCounter() - 1);
+    userRepository.put(user);
   }
 
 }

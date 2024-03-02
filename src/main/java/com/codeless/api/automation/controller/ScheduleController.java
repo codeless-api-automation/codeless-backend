@@ -2,12 +2,15 @@ package com.codeless.api.automation.controller;
 
 import static com.codeless.api.automation.util.RestApiConstant.SCHEDULES_RESOURCE;
 
+import com.codeless.api.automation.dto.ExecutionRequest;
 import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.dto.ScheduleRequest;
 import com.codeless.api.automation.dto.UpdateScheduleRequest;
+import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.ScheduleService;
 import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
+import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScheduleController {
 
   private final ScheduleService scheduleService;
+  private final ExecutionService executionService;
 
   @PutMapping
   public ResponseEntity<Void> updateSchedule(
@@ -54,7 +58,7 @@ public class ScheduleController {
   @GetMapping
   public PageRequest<ScheduleRequest> getAllSchedules(
       @RequestParam(name = "max_results", defaultValue = "25")
-      @Min(value = 1, message="max_results is positive number, min 1 is required") Integer maxResults,
+      @Min(value = 1, message = "max_results is positive number, min 1 is required") Integer maxResults,
       @RequestParam(name = "next_token", required = false) @Size(max = 200) String nextToken,
       Principal principal) {
     return scheduleService.getAllSchedules(
@@ -63,8 +67,23 @@ public class ScheduleController {
         principal.getName());
   }
 
+  @GetMapping(path = "/{scheduleId}/executions")
+  public PageRequest<ExecutionRequest> getAllExecutionsByScheduleId(
+      @PathVariable @Size(min = 40, max = 40) String scheduleId,
+      @RequestParam(name = "max_results", defaultValue = "25")
+      @Min(value = 1, message = "max_results is positive number, min 1 is required") Integer maxResults,
+      @RequestParam(name = "next_token", required = false) @Size(max = 200) String nextToken,
+      Principal principal) {
+    return executionService.getExecutionsByScheduleId(
+        scheduleId,
+        DefaultValueUtil.getMaxResultsOrDefault(maxResults),
+        nextToken,
+        principal.getName());
+  }
+
   @DeleteMapping(path = "/{scheduleId}")
-  public void deleteSchedule(@PathVariable String scheduleId, Principal principal) {
+  public void deleteSchedule(@PathVariable @Size(min = 40, max = 40) String scheduleId,
+      Principal principal) {
     scheduleService.deleteSchedule(scheduleId, principal.getName());
   }
 

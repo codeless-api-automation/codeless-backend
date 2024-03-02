@@ -10,7 +10,6 @@ import com.codeless.api.automation.dto.PageRequest;
 import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
-import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -45,15 +44,7 @@ public class ExecutionController {
       @RequestParam(name = "max_results", defaultValue = "25")
       @Min(value = 1, message="max_results is positive number, min 1 is required") Integer maxResults,
       @RequestParam(name = "next_token", required = false) @Size(max = 200) String nextToken,
-      @RequestParam(name = "schedule_id", required = false) @Size(min = 40, max = 40) String scheduleId,
       Principal principal) {
-    if (Objects.nonNull(scheduleId)) {
-      return executionService.getExecutionsByScheduleId(
-          scheduleId,
-          DefaultValueUtil.getMaxResultsOrDefault(maxResults),
-          nextToken,
-          principal.getName());
-    }
     return executionService.getAllExecutions(
         DefaultValueUtil.getMaxResultsOrDefault(maxResults),
         nextToken,

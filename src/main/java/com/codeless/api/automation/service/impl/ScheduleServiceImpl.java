@@ -4,6 +4,7 @@ import static com.codeless.api.automation.util.RestApiConstant.UNAUTHORIZED_MESS
 
 import com.codeless.api.automation.appconfig.CountryConfig.RegionDetails;
 import com.codeless.api.automation.appconfig.CountryConfigProvider;
+import com.codeless.api.automation.appconfig.LimitsConfigProvider;
 import com.codeless.api.automation.converter.EmailListConverter;
 import com.codeless.api.automation.converter.NextTokenConverter;
 import com.codeless.api.automation.converter.TimerConverter;
@@ -13,11 +14,13 @@ import com.codeless.api.automation.dto.ScheduleRequest;
 import com.codeless.api.automation.dto.UpdateScheduleRequest;
 import com.codeless.api.automation.entity.Schedule;
 import com.codeless.api.automation.entity.Test;
+import com.codeless.api.automation.entity.User;
 import com.codeless.api.automation.entity.enums.ExecutionType;
 import com.codeless.api.automation.entity.enums.ScheduleState;
 import com.codeless.api.automation.exception.ApiException;
 import com.codeless.api.automation.repository.ScheduleRepository;
 import com.codeless.api.automation.repository.TestRepository;
+import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.CronExpressionBuilderService;
 import com.codeless.api.automation.service.MetricService;
 import com.codeless.api.automation.service.ScheduleService;
@@ -53,6 +56,8 @@ public class ScheduleServiceImpl implements ScheduleService {
   private final CountryConfigProvider countryConfigProvider;
   private final NextTokenConverter nextTokenConverter;
   private final MetricService metricService;
+  private final UserRepository userRepository;
+  private final LimitsConfigProvider limitsConfigProvider;
 
   @Override
   public void createSchedule(ScheduleRequest scheduleRequest, String customerId) {
@@ -71,6 +76,16 @@ public class ScheduleServiceImpl implements ScheduleService {
               scheduleRequest.getRegion().getCity()), HttpStatus.BAD_REQUEST.value());
     }
     RegionDetails regionDetails = regionByName.get(scheduleRequest.getRegion().getCity());
+
+    User user = userRepository.get(customerId);
+
+    Integer allowedSchedulesLimit =
+        limitsConfigProvider.getSchedulesLimit(user.getUserPlan().getValue(), customerId);
+    if (Objects.nonNull(user.getSchedulesCounter())
+        && user.getSchedulesCounter() > allowedSchedulesLimit) {
+      throw new ApiException("You exceeded number of schedules allowed by your plan. "
+          + "Please consider upgrading your plan.", HttpStatus.BAD_REQUEST.value());
+    }
 
     Schedule scheduleEntity = new Schedule();
     scheduleEntity.setId(RandomIdGenerator.generateScheduleId());
@@ -99,6 +114,10 @@ public class ScheduleServiceImpl implements ScheduleService {
       scheduleRepository.delete(scheduleEntity.getId());
       throw exception;
     }
+
+    user.setSchedulesCounter(
+        user.getSchedulesCounter() == null ? 1 : user.getSchedulesCounter() + 1);
+    userRepository.put(user);
   }
 
   @Override
@@ -148,6 +167,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     schedulerClient.deleteSchedule(regionDetails.getAwsCloudRegion(), schedule.getId());
     scheduleRepository.delete(scheduleId);
     metricService.deleteMetric(scheduleId);
+
+    User user = userRepository.get(customerId);
+    user.setSchedulesCounter(
+        Objects.isNull(user.getSchedulesCounter()) ? 0 : user.getSchedulesCounter() - 1);
+    userRepository.put(user);
   }
 
   @Override

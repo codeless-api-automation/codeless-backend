@@ -16,6 +16,8 @@ public final class RestApiConstant {
   public static final String AUTH_RESOURCE = "/auth";
   public static final String HEALTH_RESOURCE = "/health";
   public static final String SPI_PATH = "/spi";
+  public static final String PROFILE_RESOURCE = "/profiles";
+
 
   public static final String X_SPI_API_KEY = "x-spi-api-key";
 
