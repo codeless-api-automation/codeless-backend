@@ -70,7 +70,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(final HttpSecurity http) throws Exception {
     http.cors().disable().csrf().disable().authorizeRequests()
-        .antMatchers("/tests/**", "/executions/**", "/schedules/**", "/regions/**").authenticated()
+        .antMatchers(
+            "/tests/**",
+            "/executions/**",
+            "/schedules/**",
+            "/regions/**",
+            "/profiles/**"
+        ).authenticated()
         .antMatchers(HttpMethod.POST, "/users").permitAll()
         .antMatchers(HttpMethod.POST, "/spi/metrics").permitAll()
         .antMatchers(HttpMethod.GET, "/health").permitAll()
