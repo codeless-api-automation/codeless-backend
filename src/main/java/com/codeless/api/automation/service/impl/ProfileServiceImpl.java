@@ -7,7 +7,9 @@ import com.codeless.api.automation.repository.UserRepository;
 import com.codeless.api.automation.service.ProfileService;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
