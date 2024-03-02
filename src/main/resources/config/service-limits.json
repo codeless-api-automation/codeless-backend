@@ -1,45 +1,51 @@
 {
   "limitByName": {
     "tests-limit": {
-      "FREE": {
-        "defaultLimit": 5,
-        "override": {}
-      },
-      "BASIC": {
-        "defaultLimit": 50,
-        "override": {}
-      },
-      "PRO": {
-        "defaultLimit": 100,
-        "override": {}
+      "limitByPlan": {
+        "FREE": {
+          "defaultLimit": 5,
+          "override": {}
+        },
+        "BASIC": {
+          "defaultLimit": 50,
+          "override": {}
+        },
+        "PRO": {
+          "defaultLimit": 100,
+          "override": {}
+        }
       }
     },
     "schedules-limit": {
-      "FREE": {
-        "defaultLimit": 1,
-        "override": {}
-      },
-      "BASIC": {
-        "defaultLimit": 5,
-        "override": {}
-      },
-      "PRO": {
-        "defaultLimit": 100,
-        "override": {}
+      "limitByPlan": {
+        "FREE": {
+          "defaultLimit": 1,
+          "override": {}
+        },
+        "BASIC": {
+          "defaultLimit": 5,
+          "override": {}
+        },
+        "PRO": {
+          "defaultLimit": 100,
+          "override": {}
+        }
       }
     },
     "canary-test-results-storage-in-bytes-limit": {
-      "FREE": {
-        "defaultLimit": 50000,
-        "override": {}
-      },
-      "BASIC": {
-        "defaultLimit": 100000,
-        "override": {}
-      },
-      "PRO": {
-        "defaultLimit": 300000,
-        "override": {}
+      "limitByPlan": {
+        "FREE": {
+          "defaultLimit": 50000,
+          "override": {}
+        },
+        "BASIC": {
+          "defaultLimit": 100000,
+          "override": {}
+        },
+        "PRO": {
+          "defaultLimit": 300000,
+          "override": {}
+        }
       }
     }
   }

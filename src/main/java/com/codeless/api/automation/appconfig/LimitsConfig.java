@@ -13,11 +13,11 @@ public class LimitsConfig {
   @Data
   public static class Limit {
 
-    private Map<String, LimitDetail> limitDetailByPlan;
+    private Map<String, LimitData> limitByPlan;
   }
 
   @Data
-  public static class LimitDetail {
+  public static class LimitData {
 
     private Integer defaultLimit;
     private Map<String, Integer> override;

@@ -1,7 +1,7 @@
 package com.codeless.api.automation.appconfig;
 
 import com.codeless.api.automation.appconfig.LimitsConfig.Limit;
-import com.codeless.api.automation.appconfig.LimitsConfig.LimitDetail;
+import com.codeless.api.automation.appconfig.LimitsConfig.LimitData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +55,7 @@ public class LimitsConfigProvider {
       return DEFAULT_LIMIT_VALUE;
     }
 
-    LimitDetail limitDetail = limit.getLimitDetailByPlan().get(plan);
+    LimitData limitDetail = limit.getLimitByPlan().get(plan);
     if (Objects.isNull(limitDetail)) {
       return DEFAULT_LIMIT_VALUE;
     }
