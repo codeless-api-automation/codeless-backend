@@ -161,10 +161,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     if (!schedule.getCustomerId().equals(customerId)) {
       throw new ApiException(UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
-    Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
-    RegionDetails regionDetails = regionByName.get(schedule.getRegionName());
-
-    schedulerClient.deleteSchedule(regionDetails.getAwsCloudRegion(), schedule.getId());
+    schedulerClient.deleteSchedule(getAwsCloudRegion(schedule), schedule.getId());
     scheduleRepository.delete(scheduleId);
     metricService.deleteMetric(scheduleId);
 
@@ -203,7 +200,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     if (isValueChanged(existingScheduleState, newScheduleState)) {
       try {
         schedulerClient.updateSchedule(
-            schedule.getRegionName(),
+            getAwsCloudRegion(schedule),
             schedule.getId(),
             ScheduleState.ENABLED.equals(newScheduleState));
       } catch (Exception exception) {
@@ -213,6 +210,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         throw exception;
       }
     }
+  }
+
+  private String getAwsCloudRegion(Schedule schedule) {
+    Map<String, RegionDetails> regionByName = countryConfigProvider.getRegions();
+    RegionDetails regionDetails = regionByName.get(schedule.getRegionName());
+    return regionDetails.getAwsCloudRegion();
   }
 
   private boolean isValueChanged(
