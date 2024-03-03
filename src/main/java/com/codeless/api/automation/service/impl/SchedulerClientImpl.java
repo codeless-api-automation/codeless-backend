@@ -15,6 +15,8 @@ import software.amazon.awssdk.services.scheduler.model.CreateScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindow;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
+import software.amazon.awssdk.services.scheduler.model.GetScheduleRequest;
+import software.amazon.awssdk.services.scheduler.model.GetScheduleResponse;
 import software.amazon.awssdk.services.scheduler.model.ScheduleState;
 import software.amazon.awssdk.services.scheduler.model.Target;
 import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
@@ -84,9 +86,17 @@ public class SchedulerClientImpl implements com.codeless.api.automation.service.
       throw new ApiException("Requested region is not available yet",
           HttpStatus.BAD_REQUEST.value());
     }
+    GetScheduleRequest getScheduleRequest = GetScheduleRequest.builder()
+        .name(scheduleName)
+        .build();
+    GetScheduleResponse getScheduleResponse = schedulerClient.getSchedule(getScheduleRequest);
+
     UpdateScheduleRequest updateScheduleRequest = UpdateScheduleRequest.builder()
         .state(isEnabled ? ScheduleState.ENABLED : ScheduleState.DISABLED)
         .name(scheduleName)
+        .target(getScheduleResponse.target())
+        .scheduleExpression(getScheduleResponse.scheduleExpression())
+        .flexibleTimeWindow(getScheduleResponse.flexibleTimeWindow())
         .build();
     schedulerClient.updateSchedule(updateScheduleRequest);
   }
