@@ -28,7 +28,7 @@ public class AuthRateLimitRequestInterceptor implements HandlerInterceptor {
       return false;
     }
 
-    final Bucket tokenBucket = pricingPlanService.resolveBucketByIp(ip);
+    final Bucket tokenBucket = pricingPlanService.resolveBucketByIp(ip, request.getRequestURI());
     final ConsumptionProbe consumptionProbe = tokenBucket.tryConsumeAndReturnRemaining(1);
     if (consumptionProbe.isConsumed()) {
       response.addHeader(RateLimitHeader.X_RATE_LIMIT_REMAINING,

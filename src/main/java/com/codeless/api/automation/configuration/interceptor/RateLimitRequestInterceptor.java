@@ -61,7 +61,7 @@ public class RateLimitRequestInterceptor implements HandlerInterceptor {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         return null;
       }
-      final Bucket bucket = pricingPlanService.resolveBucketByUserPlan(userByEmail.getUserPlan());
+      final Bucket bucket = pricingPlanService.resolveBucketByUserPlan(userByEmail.getUserPlan(), request.getRequestURI());
       rateLimitData = new RateLimitData().setUser(userByEmail).setBucket(bucket);
       RateLimitStorage.addRateLimitData(username, rateLimitData);
     }

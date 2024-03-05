@@ -15,19 +15,19 @@ public class PricingPlanServiceImpl implements PricingPlanService {
     private final Map<String, Bucket> IP_BUCKETS = new ConcurrentHashMap<>();
 
     @Override
-    public Bucket resolveBucketByUserPlan(UserPlan userPlan) {
-        return PLAN_BUCKETS.computeIfAbsent(userPlan, this::newBucket);
+    public Bucket resolveBucketByUserPlan(UserPlan userPlan, String requestPath) {
+        return PLAN_BUCKETS.computeIfAbsent(userPlan, newUserPlan -> newBucket(newUserPlan, requestPath));
     }
 
     @Override
-    public Bucket resolveBucketByIp(String ipAddress) {
-        return IP_BUCKETS.computeIfAbsent(ipAddress, userPlan -> newBucket(UserPlan.FREE));
+    public Bucket resolveBucketByIp(String ipAddress, String requestPath) {
+        return IP_BUCKETS.computeIfAbsent(ipAddress, userPlan -> newBucket(UserPlan.FREE, requestPath));
     }
 
-    private Bucket newBucket(UserPlan userPlan) {
-        final PricingPlan pricingPlan = PricingPlan.resolvePricingFromUserPlan(userPlan);
+    private Bucket newBucket(UserPlan userPlan, String requestPath) {
+        final PricingPlan pricingPlan = PricingPlan.resolvePricingFromPath(requestPath);
         return Bucket.builder()
-            .addLimit(pricingPlan.getLimit())
+            .addLimit(pricingPlan.getLimit(userPlan))
             .build();
     }
 }
