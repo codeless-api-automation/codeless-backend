@@ -24,7 +24,7 @@ public class ScheduleRequest {
   String testId;
   @NotNull Region region;
   @NotNull Timer timer;
-  @Size(min=1, max=5)
+  @Size(max=5)
   List<@Email String> emails;
   ScheduleState state;
 }

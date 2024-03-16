@@ -35,7 +35,7 @@
     "canary-test-results-storage-in-bytes-limit": {
       "limitByPlan": {
         "FREE": {
-          "defaultLimit": 50000,
+          "defaultLimit": 5000,
           "override": {}
         },
         "BASIC": {

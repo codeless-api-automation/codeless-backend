@@ -75,8 +75,7 @@ TABLE_TEST=$(cat <<EOF
         "ProjectionType": "INCLUDE",
         "NonKeyAttributes": [
           "id",
-          "name",
-          "json"
+          "name"
         ]
       },
       "ProvisionedThroughput": {
@@ -232,7 +231,8 @@ TABLE_SCHEDULE=$(cat <<EOF
           "testId",
           "timer",
           "regionName",
-          "scheduleState"
+          "scheduleState",
+          "emails"
         ]
       },
       "ProvisionedThroughput": {

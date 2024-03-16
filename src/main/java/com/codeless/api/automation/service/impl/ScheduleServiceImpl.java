@@ -143,6 +143,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             .testId(schedule.getTestId())
             .timer(timerConverter.fromString(schedule.getTimer()))
             .region(ObjectBuilder.buildRegion(schedule.getRegionName(), regionByName))
+            .emails(emailListConverter.fromString(schedule.getEmails()))
             .build())
         .collect(Collectors.toList());
     return PageRequest.<ScheduleRequest>builder()

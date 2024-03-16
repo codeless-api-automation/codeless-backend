@@ -62,8 +62,13 @@ public class TestController {
         principal.getName());
   }
 
+  @GetMapping(path = "/{testId}")
+  public TestRequest getTest(@PathVariable @Size(min = 40, max = 40) String testId, Principal principal) {
+    return testService.getTest(testId, principal.getName());
+  }
+
   @DeleteMapping(path = "/{testId}")
-  public void deleteTest(@PathVariable String testId, Principal principal) {
+  public void deleteTest(@PathVariable @Size(min = 40, max = 40) String testId, Principal principal) {
     testService.deleteTest(testId, principal.getName());
   }
 

@@ -9,4 +9,5 @@ public interface TestService {
   void createTest(TestRequest testRequest, String customerId);
   PageRequest<TestRequest> getAllTests(Integer maxResults, String nextToken, String customerId);
   void deleteTest(String id, String customerId);
+  TestRequest getTest(String testId, String customerId);
 }

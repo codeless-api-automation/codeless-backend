@@ -21,6 +21,7 @@ import com.codeless.api.automation.util.RestApiConstant;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -95,11 +96,7 @@ public class TestServiceImpl implements TestService {
         PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
     List<TestRequest> items = tests.items().stream()
-        .map(test -> TestRequest.builder()
-            .id(test.getId())
-            .name(test.getName())
-            .json(testConverter.fromString(test.getJson()))
-            .build())
+        .map(toTestRequest())
         .collect(Collectors.toList());
 
     return PageRequest.<TestRequest>builder()
@@ -130,6 +127,27 @@ public class TestServiceImpl implements TestService {
     User user = userRepository.get(customerId);
     user.setTestsCounter(Objects.isNull(user.getTestsCounter()) ? 0 : user.getTestsCounter() - 1);
     userRepository.put(user);
+  }
+
+  @Override
+  public TestRequest getTest(String testId, String customerId) {
+    Test existingTest = testRepository.get(testId);
+    if (existingTest == null) {
+      throw new ApiException("The test was not found!", HttpStatus.BAD_REQUEST.value());
+    }
+    if (!existingTest.getCustomerId().equals(customerId)) {
+      throw new ApiException(RestApiConstant.UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
+    }
+    Function<Test, TestRequest> function = toTestRequest();
+    return function.apply(existingTest);
+  }
+
+  private Function<Test, TestRequest> toTestRequest() {
+    return test -> TestRequest.builder()
+        .id(test.getId())
+        .name(test.getName())
+        .json(testConverter.fromString(test.getJson()))
+        .build();
   }
 
 }
