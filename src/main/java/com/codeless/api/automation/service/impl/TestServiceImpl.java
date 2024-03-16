@@ -21,7 +21,6 @@ import com.codeless.api.automation.util.RestApiConstant;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -96,7 +95,10 @@ public class TestServiceImpl implements TestService {
         PersistenceUtil.buildLastEvaluatedKeyInListByCustomerId(nextToken, customerId),
         maxResults);
     List<TestRequest> items = tests.items().stream()
-        .map(toTestRequest())
+        .map(test -> TestRequest.builder()
+            .id(test.getId())
+            .name(test.getName())
+            .build())
         .collect(Collectors.toList());
 
     return PageRequest.<TestRequest>builder()
@@ -138,16 +140,13 @@ public class TestServiceImpl implements TestService {
     if (!existingTest.getCustomerId().equals(customerId)) {
       throw new ApiException(RestApiConstant.UNAUTHORIZED_MESSAGE, HttpStatus.UNAUTHORIZED.value());
     }
-    Function<Test, TestRequest> function = toTestRequest();
-    return function.apply(existingTest);
-  }
-
-  private Function<Test, TestRequest> toTestRequest() {
-    return test -> TestRequest.builder()
-        .id(test.getId())
-        .name(test.getName())
-        .json(testConverter.fromString(test.getJson()))
+    return TestRequest.builder()
+        .id(existingTest.getId())
+        .name(existingTest.getName())
+        .json(testConverter.fromString(existingTest.getJson()))
         .build();
   }
+
+
 
 }

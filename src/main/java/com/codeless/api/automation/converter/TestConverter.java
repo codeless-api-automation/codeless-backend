@@ -14,7 +14,7 @@ public class TestConverter {
 
   public List<Map<Object, Object>> fromString(String json) {
     try {
-      return objectMapper.readValue(json, new TypeReference<List<Map<Object, Object>>>() {
+      return objectMapper.readValue(json, new TypeReference<>() {
       });
     } catch (JsonProcessingException e) {
       throw new RuntimeException();
