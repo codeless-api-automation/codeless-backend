@@ -14,8 +14,11 @@ import org.springframework.util.FileCopyUtils;
 @RequiredArgsConstructor
 public class LimitsConfigProvider {
 
-  private static final String TESTS_LIMIT_NAME = "tests-limit";
-  private static final String SCHEDULES_LIMIT_NAME = "schedules-limit";
+  private static final String NUMBER_OF_TESTS_LIMIT_NAME = "number-of-tests-limit";
+  private static final String NUMBER_OF_SCHEDULES_LIMIT_NAME = "number-of-schedules-limit";
+  private static final String NUMBER_OF_REQUESTS_IN_TEST_LIMIT_NAME = "number-of-requests-in-test-limit";
+  private static final String TEST_IN_BYTES_LIMIT_NAME = "test-in-bytes-limit";
+
   private static final Integer DEFAULT_LIMIT_VALUE = 0;
 
   private final ResourceLoader resourceLoader;
@@ -31,12 +34,20 @@ public class LimitsConfigProvider {
     }
   }
 
-  public Integer getTestsLimit(String plan, String customerId) {
-    return getLimit(TESTS_LIMIT_NAME, plan, customerId);
+  public Integer getNumberOfTestsLimit(String plan, String customerId) {
+    return getLimit(NUMBER_OF_TESTS_LIMIT_NAME, plan, customerId);
   }
 
-  public Integer getSchedulesLimit(String plan, String customerId) {
-    return getLimit(SCHEDULES_LIMIT_NAME, plan, customerId);
+  public Integer getNumberOfSchedulesLimit(String plan, String customerId) {
+    return getLimit(NUMBER_OF_SCHEDULES_LIMIT_NAME, plan, customerId);
+  }
+
+  public Integer getNumberOfRequestsInTestLimit(String plan, String customerId) {
+    return getLimit(NUMBER_OF_REQUESTS_IN_TEST_LIMIT_NAME, plan, customerId);
+  }
+
+  public Integer getTestInBytesLimit(String plan, String customerId) {
+    return getLimit(TEST_IN_BYTES_LIMIT_NAME, plan, customerId);
   }
 
   private Integer getLimit(String limitName, String plan, String customerId) {

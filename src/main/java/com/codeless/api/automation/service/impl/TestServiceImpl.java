@@ -20,6 +20,7 @@ import com.codeless.api.automation.util.RandomIdGenerator;
 import com.codeless.api.automation.util.RestApiConstant;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -63,16 +64,42 @@ public class TestServiceImpl implements TestService {
     User user = userRepository.get(customerId);
 
     Integer allowedTestsLimit =
-        limitsConfigProvider.getTestsLimit(user.getUserPlan().getValue(), customerId);
+        limitsConfigProvider.getNumberOfTestsLimit(user.getUserPlan().getValue(), customerId);
     if (Objects.nonNull(user.getTestsCounter()) && user.getTestsCounter() > allowedTestsLimit) {
-      throw new ApiException("You exceeded number of tests allowed by your plan. "
-          + "Please consider upgrading your plan.", HttpStatus.BAD_REQUEST.value());
+      throw new ApiException("Oops! It seems you've reached the maximum number of tests allowed "
+          + "by your current user plan. "
+          + "To continue using our services, we recommend upgrading your plan to accommodate more tests. "
+          + "If you have any questions or need assistance, feel free to contact us. "
+          + "Thank you for your understanding", HttpStatus.BAD_REQUEST.value());
+    }
+
+    Integer allowedRequestsInTestLimit =
+        limitsConfigProvider.getNumberOfRequestsInTestLimit(user.getUserPlan().getValue(), customerId);
+    List<Map<Object, Object>> requests = testRequest.getJson();
+    if (Objects.nonNull(requests) && requests.size() > allowedRequestsInTestLimit) {
+      throw new ApiException("Oops! It seems you've surpassed the allowable number of requests "
+          + "in a single test within your current user plan. "
+          + "To continue, please consider upgrading your plan for expanded capabilities. "
+          + "Should you require further assistance, don't hesitate to reach out to our support team. "
+          + "Thank you for your understanding.", HttpStatus.BAD_REQUEST.value());
+    }
+
+    String jsonTest = testConverter.toString(requests);
+    Integer allowedBytesInTestLimit =
+        limitsConfigProvider.getTestInBytesLimit(user.getUserPlan().getValue(), customerId);
+    if (Objects.nonNull(jsonTest) && jsonTest.getBytes().length > allowedBytesInTestLimit) {
+      throw new ApiException("Oops! It seems you've reached the maximum number of bytes allowed "
+          + "to store one test in your current user plan. "
+          + "To continue, please consider upgrading your plan or "
+          + "optimizing your test data to fit within the storage limits. "
+          + "Should you require further assistance, don't hesitate to reach out to our support team. "
+          + "Thank you for your understanding.", HttpStatus.BAD_REQUEST.value());
     }
 
     Test test = new Test();
     test.setId(RandomIdGenerator.generateTestId());
     test.setName(testRequest.getName());
-    test.setJson(testConverter.toString(testRequest.getJson()));
+    test.setJson(jsonTest);
     test.setCustomerId(customerId);
     test.setCreated(Instant.now());
     test.setLastModified(Instant.now());

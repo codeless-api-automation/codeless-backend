@@ -22,11 +22,11 @@ public class ProfileServiceImpl implements ProfileService {
     return Profile.builder()
         .usedTestsCount(Objects.isNull(user.getTestsCounter()) ? 0 : user.getTestsCounter())
         .allowedTestsCount(
-            limitsConfigProvider.getTestsLimit(user.getUserPlan().getValue(), customerId))
+            limitsConfigProvider.getNumberOfTestsLimit(user.getUserPlan().getValue(), customerId))
         .usedSchedulesCount(
             Objects.isNull(user.getSchedulesCounter()) ? 0 : user.getSchedulesCounter())
         .allowedSchedulesCount(
-            limitsConfigProvider.getSchedulesLimit(user.getUserPlan().getValue(), customerId))
+            limitsConfigProvider.getNumberOfSchedulesLimit(user.getUserPlan().getValue(), customerId))
         .build();
   }
 }

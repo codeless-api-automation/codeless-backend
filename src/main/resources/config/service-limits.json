@@ -1,6 +1,6 @@
 {
   "limitByName": {
-    "tests-limit": {
+    "number-of-tests-limit": {
       "limitByPlan": {
         "FREE": {
           "defaultLimit": 5,
@@ -16,7 +16,7 @@
         }
       }
     },
-    "schedules-limit": {
+    "number-of-schedules-limit": {
       "limitByPlan": {
         "FREE": {
           "defaultLimit": 1,
@@ -32,18 +32,34 @@
         }
       }
     },
-    "canary-test-results-storage-in-bytes-limit": {
+    "number-of-requests-in-test-limit": {
+      "limitByPlan": {
+        "FREE": {
+          "defaultLimit": 5,
+          "override": {}
+        },
+        "BASIC": {
+          "defaultLimit": 5,
+          "override": {}
+        },
+        "PRO": {
+          "defaultLimit": 15,
+          "override": {}
+        }
+      }
+    },
+    "test-in-bytes-limit": {
       "limitByPlan": {
         "FREE": {
           "defaultLimit": 5000,
           "override": {}
         },
         "BASIC": {
-          "defaultLimit": 100000,
+          "defaultLimit": 10000,
           "override": {}
         },
         "PRO": {
-          "defaultLimit": 300000,
+          "defaultLimit": 20000,
           "override": {}
         }
       }

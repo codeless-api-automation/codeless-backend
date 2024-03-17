@@ -80,7 +80,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     User user = userRepository.get(customerId);
 
     Integer allowedSchedulesLimit =
-        limitsConfigProvider.getSchedulesLimit(user.getUserPlan().getValue(), customerId);
+        limitsConfigProvider.getNumberOfSchedulesLimit(user.getUserPlan().getValue(), customerId);
     if (Objects.nonNull(user.getSchedulesCounter())
         && user.getSchedulesCounter() > allowedSchedulesLimit) {
       throw new ApiException("You exceeded number of schedules allowed by your plan. "
