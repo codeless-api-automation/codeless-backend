@@ -10,7 +10,6 @@ import com.codeless.api.automation.service.ExecutionService;
 import com.codeless.api.automation.service.ScheduleService;
 import com.codeless.api.automation.util.DefaultValueUtil;
 import java.security.Principal;
-import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;

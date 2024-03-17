@@ -18,7 +18,7 @@ public enum PricingPlan {
 
   public Bandwidth getLimit() {
     return Bandwidth.builder().capacity(bucketCapacity)
-        .refillIntervally(bucketCapacity, Duration.ofHours(1)).build();
+        .refillIntervally(bucketCapacity, Duration.ofSeconds(1)).build();
   }
 
   public static PricingPlan resolvePricingFromUserPlan(UserPlan userPlan) {

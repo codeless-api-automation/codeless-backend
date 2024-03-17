@@ -1,11 +1,16 @@
 package com.codeless.api.automation.storage;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class RateLimitStorage {
 
-  private static final Map<String, RateLimitData> STORAGE = new ConcurrentHashMap<>();
+  private static final Map<String, RateLimitData> STORAGE = new LinkedHashMap<>(){
+    @Override
+    protected boolean removeEldestEntry(final Map.Entry eldest) {
+      return size() > 1000;
+    }
+  };
 
   private  RateLimitStorage() {
     throw new RuntimeException();

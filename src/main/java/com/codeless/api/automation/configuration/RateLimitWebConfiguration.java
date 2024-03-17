@@ -16,7 +16,12 @@ public class RateLimitWebConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // TODO add appropriate patterns for other endpoints
-        registry.addInterceptor(rateLimitRequestInterceptor).addPathPatterns("/tests/**");
+        registry.addInterceptor(rateLimitRequestInterceptor).addPathPatterns(
+            "/tests/**",
+            "/executions/**",
+            "/schedules/**",
+            "/regions",
+            "/profiles");
         registry.addInterceptor(authRateLimitRequestInterceptor).addPathPatterns("/auth/sign-in", "/auth/sign-out", "/users", "/verify");
     }
 }
