@@ -38,8 +38,9 @@
     letter-spacing: 0.5px; /* Adjust letter spacing to match Material UI */
     text-transform: uppercase; /* Adjust text transform to match Material UI */
   }
-  .btn:hover {
-    background-color: #0056b3;
+  .btn a {
+    text-decoration: none; /* Remove underline */
+    color: #fff; /* Set the color of the text inside the <a> tag to white */
   }
 </style>
 </head>
@@ -49,7 +50,9 @@
   <p>Welcome to API Sentinel.</p>
   <p>Please click the button below to verify your email address.</p>
   <p style="text-align: center;">
-    <a th:href="${VERIFICATION_URL}" class="btn" target="_blank">Verify Email</a>
+    <span class="btn" id="verifyButton">
+      <a th:href="${VERIFICATION_URL}" target="_blank">Verify Email</a>
+    </span>
   </p>
   <p>If you didn't request this, you can safely ignore this email.</p>
   <p>Best regards,<br>API Sentinel team</p>
