@@ -4,6 +4,6 @@ import com.codeless.api.automation.entity.enums.UserPlan;
 import io.github.bucket4j.Bucket;
 
 public interface PricingPlanService {
-  Bucket resolveBucketByUserPlan(UserPlan userPlan, String path);
-  Bucket resolveBucketByIp(String ipAddress, String path);
+  Bucket resolveBucketByUserPlan(UserPlan userPlan, String requestPath);
+  Bucket resolveBucketByIp(String ipAddress, String requestPath);
 }
